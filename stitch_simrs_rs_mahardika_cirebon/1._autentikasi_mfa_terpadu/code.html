@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-primary":"#a8c8ff","primary-fixed":"#d6e3ff","on-background":"#0b1c30","on-error-container":"#93000a","inverse-on-surface":"#eaf1ff","outline":"#727783","background":"#f8f9ff","surface-bright":"#f8f9ff","error":"#ba1a1a","inverse-surface":"#213145","surface-dim":"#cbdbf5","surface-container-lowest":"#ffffff","on-secondary-fixed":"#131b2e","on-primary-fixed":"#001b3d","on-primary-container":"#dbe6ff","on-primary-fixed-variant":"#00468a","on-tertiary-fixed":"#002204","on-surface":"#0b1c30","outline-variant":"#c1c6d4","primary":"#004e99","primary-fixed-dim":"#a8c8ff","surface-container-high":"#dce9ff","tertiary-fixed":"#a3f69c","surface-container":"#e5eeff","tertiary":"#015d15","secondary-fixed":"#dae2fd","on-secondary":"#ffffff","error-container":"#ffdad6","on-primary":"#ffffff","on-tertiary":"#ffffff","secondary-container":"#dae2fd","on-tertiary-container":"#a7fa9f","surface-container-highest":"#d3e4fe","surface-tint":"#005eb5","secondary-fixed-dim":"#bec6e0","on-surface-variant":"#414752","on-tertiary-fixed-variant":"#005312","surface-container-low":"#eff4ff","tertiary-fixed-dim":"#88d982","surface-variant":"#d3e4fe","tertiary-container":"#26762c","on-secondary-container":"#5c647a","surface":"#f8f9ff","primary-container":"#0a66c2","on-secondary-fixed-variant":"#3f465c","secondary":"#565e74","on-error":"#ffffff"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-xl":"2rem","margin":"1rem","gutter-desktop":"1.5rem","gutter":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-tablet":"1.5rem","space-md":"1rem","margin-desktop":"2rem","space-lg":"1.5rem"},fontFamily:{"body-sm":["Inter"],"headline-xl-mobile":["Plus Jakarta Sans"],"title-md":["Inter"],"label-lg":["Inter"],"display-lg":["Plus Jakarta Sans"],"label-sm":["Inter"],"headline-lg":["Plus Jakarta Sans"],"label-md":["Inter"],"headline-xl":["Plus Jakarta Sans"],"data-display":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"headline-md":["Plus Jakarta Sans"],"display-lg-mobile":["Plus Jakarta Sans"]},fontSize:{"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-xl-mobile":["26px",{"lineHeight":"34px","letterSpacing":"-0.01em","fontWeight":"700"}],"title-md":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-lg":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"700"}],"headline-lg":["24px",{"lineHeight":"32px","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"data-display":["28px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"display-lg-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen"><main class="w-full min-h-screen bg-surface"><div class="flex flex-col w-full">
+<div class="w-full relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-2rem)]">
+<!-- Ambient Healthcare Visual Layer -->
+<div class="absolute -top-32 -left-32 w-96 h-96 bg-primary-fixed/40 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-32 -right-32 w-96 h-96 bg-secondary-fixed/50 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Institutional Top Bar Notice -->
+<div class="w-full max-w-xl mb-6 flex items-center justify-between px-3 py-2 rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center space-x-2">
+<span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase">Server Utama RS Mahardika Cirebon: Aktif</span>
+</div>
+<div class="flex items-center space-x-1 text-primary">
+<span class="material-symbols-outlined text-body-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-label-sm font-semibold">Enkripsi 256-Bit</span>
+</div>
+</div>
+<!-- Main Authentication Gateway Card -->
+<div class="w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-xl p-6 sm:p-10 relative z-10">
+<!-- Hospital Branding Header -->
+<div class="flex flex-col items-center text-center mb-8">
+<div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-on-primary shadow-md mb-3">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+</div>
+<div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-surface-container mb-2">
+<span class="font-label-sm text-label-sm text-primary font-bold">KEMENKES RI SATUSEHAT TERINTEGRASI</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">SIMRS RS Mahardika Cirebon</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">Pintu Masuk Terpadu Layanan Rumah Sakit</p>
+</div>
+<!-- Segmented Control Role Switcher -->
+<div class="p-1 rounded-xl bg-surface-container-low flex items-center space-x-1 mb-8 shadow-inner" role="tablist">
+<button aria-selected="true" class="flex-1 py-2.5 px-3 rounded-lg font-label-lg text-label-lg transition-all duration-200 flex items-center justify-center space-x-2 bg-surface-container-lowest text-primary shadow-sm" id="btn-patient-tab" onclick="switchAuthTab('patient')" role="tab" type="button">
+<span class="material-symbols-outlined text-body-md">person</span>
+<span>Portal Pasien</span>
+</button>
+<button aria-selected="false" class="flex-1 py-2.5 px-3 rounded-lg font-label-lg text-label-lg transition-all duration-200 flex items-center justify-center space-x-2 text-secondary hover:text-on-surface" id="btn-staff-tab" onclick="switchAuthTab('staff')" role="tab" type="button">
+<span class="material-symbols-outlined text-body-md">stethoscope</span>
+<span>Dokter &amp; Staf Medis</span>
+</button>
+</div>
+<!-- SECTION 1: Patient Login Form -->
+<div class="transition-opacity duration-200 block" id="form-patient-view">
+<div class="mb-5">
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-lg text-label-lg text-on-surface" for="patient-id">NIK (KTP) / No. WhatsApp / Email</label>
+<span class="font-label-sm text-label-sm text-secondary">Terdaftar di Rekam Medis</span>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-body-lg pointer-events-none">badge</span>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="patient-id" placeholder="3274012803890002" type="text"/>
+</div>
+</div>
+<div class="mb-5">
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-lg text-label-lg text-on-surface" for="patient-password">Kata Sandi</label>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Lupa Kata Sandi?</a>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-body-lg pointer-events-none">lock</span>
+<input class="w-full pl-10 pr-10 py-2.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="patient-password" placeholder="••••••••••••" type="password"/>
+<button class="absolute right-3 text-secondary hover:text-on-surface" onclick="togglePasswordVisibility('patient-password', this)" type="button">
+<span class="material-symbols-outlined text-body-lg">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between mb-6">
+<label class="flex items-center space-x-2.5 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-primary focus:ring-offset-0 bg-surface-container-low" type="checkbox"/>
+<span class="font-body-md text-body-md text-secondary">Ingat saya di perangkat ini</span>
+</label>
+<span class="px-2 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">BPJS &amp; Umum</span>
+</div>
+<button class="w-full py-3 px-4 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md transition-colors flex items-center justify-center space-x-2" type="button">
+<span>Masuk ke Portal Pasien</span>
+<span class="material-symbols-outlined text-body-lg">arrow_forward</span>
+</button>
+<!-- Divider with Text -->
+<div class="relative my-6 flex items-center justify-center">
+<div class="w-full h-px bg-surface-container-highest"></div>
+<span class="absolute bg-surface-container-lowest px-3 font-label-sm text-label-sm uppercase tracking-wider text-secondary">atau login cepat</span>
+</div>
+<!-- WhatsApp OTP Action -->
+<button class="w-full py-2.5 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg shadow-sm transition-colors flex items-center justify-center space-x-2.5" type="button">
+<div class="w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-body-sm" style="font-variation-settings: 'FILL' 1;">chat</span>
+</div>
+<span>Kirim Kode OTP via WhatsApp</span>
+</button>
+<div class="mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-center gap-2 bg-surface-container-low/60 p-3.5 rounded-xl">
+<div class="text-left">
+<p class="font-label-md text-label-md text-on-surface font-semibold">Belum pernah berobat ke RS Mahardika?</p>
+<p class="font-body-sm text-body-sm text-secondary">Registrasi mandiri tanpa antre di Admisi.</p>
+</div>
+<a class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest text-primary font-label-md text-label-md font-bold shadow-sm hover:bg-surface-container-high transition-colors whitespace-nowrap" href="#">
+            Daftar Pasien Baru
+          </a>
+</div>
+</div>
+<!-- SECTION 2: Medical Staff Login & MFA Form -->
+<div class="transition-opacity duration-200 hidden" id="form-staff-view">
+<div class="mb-4">
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-lg text-label-lg text-on-surface" for="staff-nip">Nomor Induk Pegawai (NIP / ID Karyawan)</label>
+<span class="font-label-sm text-label-sm text-secondary">SIP / STR Aktif</span>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-body-lg pointer-events-none">badge</span>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-sm uppercase" id="staff-nip" placeholder="DOK-1988-004" type="text"/>
+</div>
+</div>
+<div class="mb-5">
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-lg text-label-lg text-on-surface" for="staff-password">Kata Sandi Petugas</label>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Bantuan TI Medis</a>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-body-lg pointer-events-none">encrypted</span>
+<input class="w-full pl-10 pr-10 py-2.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="staff-password" placeholder="••••••••••••" type="password"/>
+<button class="absolute right-3 text-secondary hover:text-on-surface" onclick="togglePasswordVisibility('staff-password', this)" type="button">
+<span class="material-symbols-outlined text-body-lg">visibility</span>
+</button>
+</div>
+</div>
+<!-- MFA Section -->
+<div class="mb-6 p-4 rounded-xl bg-surface-container-low space-y-3">
+<div class="flex items-center space-x-2 text-on-surface">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">security</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">Verifikasi Dua Langkah (MFA Mandatory)</span>
+<span class="font-body-sm text-body-sm text-secondary">Buka aplikasi Google Authenticator / Mahardika Key</span>
+</div>
+</div>
+<!-- 6-digit TOTP Input Group -->
+<div class="flex items-center justify-center space-x-2 sm:space-x-3 pt-1">
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" type="text" value="7"/>
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" type="text" value="4"/>
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" type="text" value="2"/>
+<span class="text-secondary font-bold text-headline-md">-</span>
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-on-surface shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" placeholder="•" type="text"/>
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-on-surface shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" placeholder="•" type="text"/>
+<input class="totp-box w-10 h-12 sm:w-11 sm:h-12 text-center font-headline-md text-headline-md rounded-lg bg-surface-container-lowest text-on-surface shadow-sm focus:outline-none focus:ring-2 focus:ring-primary" maxlength="1" placeholder="•" type="text"/>
+</div>
+<div class="flex items-center space-x-1.5 pt-1 text-secondary">
+<span class="material-symbols-outlined text-body-sm text-error">info</span>
+<span class="font-body-sm text-body-sm">Akun otomatis terkunci 15 menit setelah 5 kali gagal login.</span>
+</div>
+</div>
+<button class="w-full py-3 px-4 rounded-lg bg-inverse-surface hover:bg-on-surface text-inverse-on-surface font-label-lg text-label-lg shadow-md transition-colors flex items-center justify-center space-x-2" type="button">
+<span class="material-symbols-outlined text-body-lg">verified</span>
+<span>Verifikasi &amp; Masuk Dashboard Internal</span>
+</button>
+<div class="mt-5 p-3 rounded-lg bg-surface-container flex items-center justify-between text-secondary">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-body-md">domain</span>
+<span class="font-label-sm text-label-sm">IP Stasiun Kerja: 10.24.110.82 (VLAN Poli Medis)</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-primary">Zona Aman</span>
+</div>
+</div>
+</div>
+<!-- Institutional Footer & Medical Credentials -->
+<div class="w-full max-w-xl mt-6 text-center space-y-2">
+<div class="flex items-center justify-center space-x-4 text-secondary font-label-sm text-label-sm">
+<span>© 2024 RS Mahardika Cirebon</span>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">Kebijakan Privasi Pasien</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">Standar Kemenkes SATUSEHAT</a>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">
+        Layanan darurat medis 24 jam Call Center: <span class="font-semibold text-on-surface">(0231) 200-999</span> | Jl. Ir. H. Juanda No. 18, Cirebon
+      </p>
+</div>
+</div>
+</div>
+<script>
+  function switchAuthTab(type) {
+    const patientTab = document.getElementById('btn-patient-tab');
+    const staffTab = document.getElementById('btn-staff-tab');
+    const patientForm = document.getElementById('form-patient-view');
+    const staffForm = document.getElementById('form-staff-view');
+
+    if (type === 'patient') {
+      // Buttons state
+      patientTab.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      patientTab.classList.remove('text-secondary');
+      patientTab.setAttribute('aria-selected', 'true');
+
+      staffTab.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      staffTab.classList.add('text-secondary');
+      staffTab.setAttribute('aria-selected', 'false');
+
+      // Forms state
+      patientForm.classList.remove('hidden');
+      staffForm.classList.add('hidden');
+    } else {
+      // Buttons state
+      staffTab.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      staffTab.classList.remove('text-secondary');
+      staffTab.setAttribute('aria-selected', 'true');
+
+      patientTab.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      patientTab.classList.add('text-secondary');
+      patientTab.setAttribute('aria-selected', 'false');
+
+      // Forms state
+      staffForm.classList.remove('hidden');
+      patientForm.classList.add('hidden');
+    }
+  }
+
+  function togglePasswordVisibility(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.textContent = 'visibility_off';
+    } else {
+      field.type = 'password';
+      icon.textContent = 'visibility';
+    }
+  }
+
+  // Auto-advance TOTP input focus
+  document.addEventListener('DOMContentLoaded', () => {
+    const totpInputs = document.querySelectorAll('.totp-box');
+    totpInputs.forEach((input, index) => {
+      input.addEventListener('keyup', (e) => {
+        if (e.key >= '0' && e.key <= '9') {
+          if (index < totpInputs.length - 1) {
+            totpInputs[index + 1].focus();
+            totpInputs[index + 1].select();
+          }
+        } else if (e.key === 'Backspace') {
+          if (index > 0 && !input.value) {
+            totpInputs[index - 1].focus();
+          }
+        }
+      });
+    });
+  });
+</script></main></body></html>

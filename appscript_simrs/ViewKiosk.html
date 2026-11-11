@@ -1,0 +1,175 @@
+<!-- ======================================================== -->
+<!-- VIEW: KIOSK MANDIRI LOBI & TRIAGE PENJAMIN BIAYA         -->
+<!-- Modul 4.2 & 4.3 PRD & Design System                      -->
+<!-- ======================================================== -->
+<section id="view-kiosk" class="app-view py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)] flex flex-col justify-between">
+  
+  <div class="max-w-7xl mx-auto w-full space-y-6">
+    
+    <!-- Kiosk Top Bar & Clock -->
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-inverse-surface text-inverse-on-surface p-4 rounded-2xl shadow-lg border border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-md">
+          <span class="material-symbols-outlined text-[28px] material-symbols-fill">local_hospital</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight text-white">RS Mahardika Cirebon</h2>
+            <span class="px-2 py-0.5 rounded-full bg-tertiary text-white text-[10px] font-bold">KIOSK AKTIF</span>
+          </div>
+          <p class="text-xs text-slate-300">Anjungan Pendaftaran Mandiri (Kiosk 01 - Lobi Utama)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+        <span class="material-symbols-outlined text-blue-400 text-[20px]">schedule</span>
+        <div class="text-right">
+          <div class="font-display text-sm font-bold text-white" id="kiosk-live-clock">11 Nov 2026 | 08:45 WIB</div>
+          <div class="text-[10px] text-emerald-400 font-semibold">BPJS VClaim Online & SatuSehat Terhubung</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4-Step Progress Indicator -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+      <div id="step-pill-1" class="flex items-center gap-2 bg-primary-container text-white p-3 rounded-xl shadow font-semibold">
+        <span class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center font-bold text-xs">1</span>
+        <span>Pilih Penjamin</span>
+      </div>
+      <div id="step-pill-2" class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+        <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">2</span>
+        <span>Validasi Berkas</span>
+      </div>
+      <div id="step-pill-3" class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+        <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">3</span>
+        <span>Pilih Dokter & Poli</span>
+      </div>
+      <div id="step-pill-4" class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+        <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">4</span>
+        <span>Cetak Tiket QR</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Grid 8 cols vs 4 cols) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Left (8 cols): Interactive Triage Selection & Dynamic Form -->
+      <div class="lg:col-span-8 space-y-6">
+        
+        <!-- 3 Big Cards -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-base font-bold text-on-surface">1. Sentuh Jenis Penjamin Biaya Anda:</h3>
+            <span class="text-xs bg-blue-50 text-primary px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">touch_app</span> Layar Sentuh Aktif
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            
+            <!-- Card 1: UMUM -->
+            <div id="kiosk-card-umum" onclick="setKioskPenjamin('UMUM')" class="cursor-pointer border-2 border-slate-200 hover:border-blue-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2">
+              <div class="w-12 h-12 mx-auto rounded-xl bg-blue-100 text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">payments</span>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900">PASIEN UMUM</h4>
+              <span class="inline-block chip-umum text-[10px] font-bold px-2 py-0.5 rounded">Self-Pay / Mandiri</span>
+              <p class="text-[11px] text-secondary">Pembayaran mandiri di kasir via tunai, debit, atau QRIS.</p>
+            </div>
+
+            <!-- Card 2: BPJS (Default Active) -->
+            <div id="kiosk-card-bpjs" onclick="setKioskPenjamin('BPJS')" class="cursor-pointer border-2 border-emerald-500 ring-2 ring-emerald-300 rounded-xl p-4 transition bg-emerald-50/50 text-center space-y-2">
+              <div class="w-12 h-12 mx-auto rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow">
+                <span class="material-symbols-outlined text-[28px] material-symbols-fill">health_and_safety</span>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900">BPJS KESEHATAN</h4>
+              <span class="inline-block chip-bpjs text-[10px] font-bold px-2 py-0.5 rounded">Integrasi VClaim / SEP</span>
+              <p class="text-[11px] text-emerald-900">Wajib memiliki rujukan aktif dari Faskes 1 / Puskesmas.</p>
+            </div>
+
+            <!-- Card 3: ASURANSI SWASTA -->
+            <div id="kiosk-card-asuransi" onclick="setKioskPenjamin('ASURANSI_SWASTA')" class="cursor-pointer border-2 border-slate-200 hover:border-amber-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2">
+              <div class="w-12 h-12 mx-auto rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">verified_user</span>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900">ASURANSI SWASTA</h4>
+              <span class="inline-block chip-asuransi text-[10px] font-bold px-2 py-0.5 rounded">Pre-Authorization</span>
+              <p class="text-[11px] text-secondary">Prudential, Allianz, Manulife, Astra Life, dll.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Dynamic Form Container -->
+        <div id="kiosk-dynamic-form" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <!-- Rendered via JS -->
+        </div>
+
+      </div>
+
+      <!-- Right (4 cols): Thermal Ticket Simulator -->
+      <div class="lg:col-span-4 space-y-4">
+        
+        <div class="bg-white p-5 rounded-2xl border-2 border-dashed border-slate-300 shadow-md text-center" id="printable-ticket">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Simulasi Tiket Fisik (Thermal Print)</span>
+          
+          <div class="border-t-2 border-b-2 border-slate-900 py-4 my-2 font-mono">
+            <h4 class="font-bold text-base text-slate-900">RS MAHARDIKA CIREBON</h4>
+            <p class="text-[10px] text-slate-500">Jl. Brigjen Dharsono No. 45, Cirebon</p>
+            
+            <div class="my-3">
+              <span class="text-xs text-slate-500 block">NOMOR ANTRIAN POLI</span>
+              <span id="ticket-number-display" class="text-4xl font-black text-primary tracking-wider font-mono">B-015</span>
+            </div>
+
+            <div class="my-2">
+              <span id="ticket-badge-display" class="inline-block px-3 py-1 rounded font-bold text-xs chip-bpjs">
+                PASIEN BPJS KESEHATAN
+              </span>
+            </div>
+
+            <div class="text-left text-xs space-y-1 mt-3 pt-2 border-t border-dashed border-slate-300">
+              <p><span class="text-slate-500">Poli:</span> <b id="ticket-poli-display">Poliklinik Penyakit Dalam</b></p>
+              <p><span class="text-slate-500">Dokter:</span> <b id="ticket-doc-display">dr. Handoko, Sp.PD</b></p>
+              <p><span class="text-slate-500">Lokasi:</span> <b id="ticket-room-display">Ruang Poli 2 (Lantai 1)</b></p>
+              <p><span class="text-slate-500">Pasien:</span> <b id="ticket-patient-display">Ny. Siti Rahmawati</b></p>
+              <p id="ticket-sep-row"><span class="text-slate-500">No. SEP:</span> <span id="ticket-sep-display" class="font-mono text-[11px] font-bold text-emerald-800">0115R0021126V000142</span></p>
+            </div>
+
+            <!-- Simulated QR Code -->
+            <div class="mt-4 flex flex-col items-center">
+              <div class="w-24 h-24 bg-slate-900 p-1.5 rounded-lg flex flex-col items-center justify-center text-[10px] text-white">
+                <div class="grid grid-cols-4 gap-1 p-1 bg-white text-black font-bold">
+                  <span>■</span><span>□</span><span>■</span><span>■</span>
+                  <span>□</span><span>■</span><span>□</span><span>□</span>
+                  <span>■</span><span>□</span><span>■</span><span>□</span>
+                  <span>■</span><span>■</span><span>□</span><span>■</span>
+                </div>
+                <span class="text-[9px] mt-1 text-slate-300">SCAN DI POLI</span>
+              </div>
+              <p class="text-[10px] text-slate-500 mt-2 font-sans">Estimasi Dilayani: <span id="ticket-est-time">09:15 WIB</span></p>
+            </div>
+          </div>
+
+          <button onclick="window.print()" class="w-full mt-2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">print</span>
+            <span>Cetak Ulang Tiket Fisik</span>
+          </button>
+        </div>
+
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1">
+          <p class="font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">info</span>
+            Aturan Kuota (PRD Modul 4.4):
+          </p>
+          <p class="text-[11px] text-blue-800">• Kuota BPJS: 15 / hari • Umum: 10 / hari • Asuransi: 5 / hari.</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+

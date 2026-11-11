@@ -1,0 +1,233 @@
+<!-- ======================================================== -->
+<!-- VIEW: AUTENTIKASI TERPADU & MFA (PORTAL PASIEN & STAF)   -->
+<!-- Modul 4.1 PRD & Design System                            -->
+<!-- ======================================================== -->
+<section id="view-auth" class="app-view hidden py-6 px-4 sm:px-6 flex flex-col items-center justify-center min-h-[calc(100vh-5rem)]">
+  
+  <!-- Ambient Healthcare Glow -->
+  <div class="w-full max-w-xl mb-4 flex items-center justify-between px-4 py-2 rounded-xl bg-surface-container-low shadow-sm border border-slate-200">
+    <div class="flex items-center space-x-2">
+      <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+      <span class="text-xs font-semibold text-secondary uppercase tracking-wider">Server RS Mahardika Cirebon: Online</span>
+    </div>
+    <div class="flex items-center space-x-1 text-primary text-xs font-bold">
+      <span class="material-symbols-outlined text-[16px]">verified_user</span>
+      <span>Enkripsi Medis 256-Bit</span>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8">
+    
+    <!-- Branding Header -->
+    <div class="flex flex-col items-center text-center mb-6">
+      <div class="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-md mb-3">
+        <span class="material-symbols-outlined text-[32px] material-symbols-fill">local_hospital</span>
+      </div>
+      <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold mb-1.5">
+        <span>KEMENKES RI SATUSEHAT TERINTEGRASI</span>
+      </div>
+      <h1 class="font-display text-2xl font-bold text-on-surface">SIMRS RS Mahardika Cirebon</h1>
+      <p class="text-xs sm:text-sm text-secondary mt-0.5">Pintu Masuk Terpadu Layanan Rumah Sakit</p>
+    </div>
+
+    <!-- Segmented Role Switcher -->
+    <div class="p-1 rounded-xl bg-surface-container-low flex items-center mb-6 border border-slate-200">
+      <button id="auth-tab-patient" onclick="switchAuthTab('patient')" class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-[18px]">person</span>
+        <span>Portal Pasien</span>
+      </button>
+      <button id="auth-tab-staff" onclick="switchAuthTab('staff')" class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-[18px]">stethoscope</span>
+        <span>Dokter & Staf Medis</span>
+      </button>
+    </div>
+
+    <!-- FORM 1: PORTAL PASIEN -->
+    <div id="auth-form-patient" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-on-surface mb-1">NIK (KTP) / No. WhatsApp / Email</label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">badge</span>
+          <input type="text" id="login-patient-id" value="3274012803890002" placeholder="Contoh: 3274012803890002" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-lowest">
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs font-semibold text-on-surface">Kata Sandi</label>
+          <a href="#" onclick="alert('Fitur reset sandi dikirim via WhatsApp')" class="text-xs text-primary hover:underline font-medium">Lupa Sandi?</a>
+        </div>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">lock</span>
+          <input type="password" id="login-patient-pass" value="pasien123" placeholder="••••••••••••" class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-lowest">
+          <button type="button" onclick="togglePasswordVisibility('login-patient-pass')" class="absolute right-3 text-secondary hover:text-on-surface">
+            <span class="material-symbols-outlined text-[18px]">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs">
+        <label class="flex items-center space-x-2 cursor-pointer text-secondary">
+          <input type="checkbox" checked class="rounded text-primary focus:ring-primary">
+          <span>Ingat saya di perangkat ini</span>
+        </label>
+        <span class="px-2 py-0.5 rounded chip-bpjs text-[10px] font-bold">BPJS & UMUM</span>
+      </div>
+
+      <button type="button" onclick="handleAuthSubmit('patient')" class="w-full py-2.5 bg-primary hover:bg-primary-container text-white font-bold text-xs sm:text-sm rounded-lg shadow transition flex items-center justify-center gap-2">
+        <span>Masuk ke Portal Pasien</span>
+        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+      </button>
+
+      <div class="relative my-4 flex items-center justify-center">
+        <div class="w-full border-t border-slate-200"></div>
+        <span class="absolute bg-white px-3 text-[11px] font-bold text-secondary uppercase tracking-wider">atau login cepat</span>
+      </div>
+
+      <button type="button" onclick="handleSendOTP()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold text-xs rounded-lg transition flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-emerald-600 material-symbols-fill">chat</span>
+        <span>Kirim Kode OTP via WhatsApp</span>
+      </button>
+
+      <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between text-xs mt-4">
+        <div>
+          <p class="font-bold text-blue-900">Belum Punya Nomor Rekam Medis?</p>
+          <p class="text-blue-700 text-[11px]">Daftar mandiri sebagai pasien baru.</p>
+        </div>
+        <button type="button" onclick="openPatientRegisterModal()" class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white font-bold rounded-lg shadow-sm transition text-xs flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">person_add</span>
+          <span>Daftar Pasien Baru</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: REGISTRASI PASIEN BARU MANDIRI -->
+    <div id="modal-register-patient" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold">
+              +
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-slate-900 text-sm sm:text-base">Registrasi Pasien Baru</h3>
+              <p class="text-[11px] text-slate-500">Penerbitan Nomor Rekam Medis Elektronik Mandiri</p>
+            </div>
+          </div>
+          <button type="button" onclick="closePatientRegisterModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        </div>
+
+        <form onsubmit="event.preventDefault(); submitPatientRegister();" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Induk Kependudukan (NIK KTP) *</label>
+            <input type="text" id="reg-patient-nik" required maxlength="16" placeholder="Contoh: 3274012803890005" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap (Sesuai KTP) *</label>
+            <input type="text" id="reg-patient-name" required placeholder="Contoh: Ahmad Fauzi Prasetyo" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Lahir *</label>
+              <input type="date" id="reg-patient-birth" required value="1995-05-12" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin *</label>
+              <select id="reg-patient-gender" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                <option value="L">Laki-Laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP Aktif *</label>
+              <input type="tel" id="reg-patient-phone" required placeholder="08123456789" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Penjamin Utama</label>
+              <select id="reg-patient-penjamin" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                <option value="BPJS">BPJS Kesehatan</option>
+                <option value="UMUM">Umum (Self-Pay)</option>
+                <option value="ASURANSI_SWASTA">Asuransi Swasta</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Akun Baru *</label>
+            <input type="password" id="reg-patient-password" required value="pasien123" placeholder="Minimal 6 karakter" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+          </div>
+
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-600 material-symbols-fill">verified</span>
+            <span>Nomor Rekam Medis (No. RM) akan otomatis digenerate dan tersimpan permanen.</span>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closePatientRegisterModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+              Batal
+            </button>
+            <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-container text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
+              <span>Simpan & Terbitkan No. RM</span>
+              <span class="material-symbols-outlined text-[16px]">check</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- FORM 2: DOKTER & STAF MEDIS (MFA) -->
+    <div id="auth-form-staff" class="space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-semibold text-on-surface mb-1">Nomor Induk Pegawai (NIP / ID Karyawan)</label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">badge</span>
+          <input type="text" id="login-staff-nip" value="DOK-1988-004" placeholder="DOK-1988-004 / ADM-012" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-lowest">
+        </div>
+        <span class="text-[10px] text-slate-500 mt-0.5 block">Demo NIP Dokter: <b>DOK-1988-004</b> | Admin Farmasi: <b>ADM-012</b></span>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-on-surface mb-1">Kata Sandi Petugas</label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">lock</span>
+          <input type="password" id="login-staff-pass" value="dokter123" placeholder="••••••••••••" class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-lowest">
+          <button type="button" onclick="togglePasswordVisibility('login-staff-pass')" class="absolute right-3 text-secondary hover:text-on-surface">
+            <span class="material-symbols-outlined text-[18px]">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MFA Section Box -->
+      <div class="p-3.5 bg-amber-50 border border-amber-300 rounded-xl space-y-2">
+        <div class="flex items-center gap-1.5 text-amber-900 text-xs font-bold">
+          <span class="material-symbols-outlined text-[18px] text-amber-700">shield_lock</span>
+          <span>Verifikasi Dua Langkah (MFA TOTP Wajib)</span>
+        </div>
+        <p class="text-[11px] text-amber-800">
+          Masukkan 6 digit kode dari Google Authenticator (Kode demo: <b>123456</b> atau <b>742918</b>):
+        </p>
+        <div class="flex gap-2 justify-center py-1">
+          <input type="text" maxlength="6" id="login-staff-totp" value="123456" class="w-44 text-center tracking-[0.4em] font-mono text-base font-black px-3 py-1.5 rounded-lg border-2 border-amber-400 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+      </div>
+
+      <div class="text-[11px] text-secondary flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">info</span>
+        <span>Auto-logout 15 menit & Proteksi Brute-Force aktif.</span>
+      </div>
+
+      <button type="button" onclick="handleAuthSubmit('staff')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition flex items-center justify-center gap-2">
+        <span>Verifikasi & Masuk Dashboard Internal</span>
+        <span class="material-symbols-outlined text-[18px]">lock_open</span>
+      </button>
+    </div>
+
+  </div>
+</section>
+

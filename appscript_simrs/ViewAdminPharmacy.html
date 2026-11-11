@@ -1,0 +1,200 @@
+<!-- ======================================================== -->
+<!-- VIEW: ADMIN PENDAFTARAN & DEPO FARMASI                   -->
+<!-- Modul 4.6 & 4.7 PRD & Design System                      -->
+<!-- ======================================================== -->
+<section id="view-admin" class="app-view hidden py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)]">
+  
+  <div class="max-w-7xl mx-auto w-full space-y-6">
+    
+    <!-- Top Operations Header -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-secondary text-white flex items-center justify-center font-bold text-xl shadow">
+          <span class="material-symbols-outlined text-[28px]">admin_panel_settings</span>
+        </div>
+        <div>
+          <h2 class="font-display text-lg font-bold text-slate-900">SIMRS Mahardika | Panel Administrasi & Farmasi</h2>
+          <p class="text-xs text-secondary">Verifikasi Penjamin Biaya (Admisi) & Antrian Dispensing Obat (Depo Farmasi)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openAddDoctorModal()" class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg shadow-sm flex items-center gap-1.5 transition">
+          <span class="material-symbols-outlined text-[16px]">person_add</span>
+          <span>+ Tambah Dokter Baru</span>
+        </button>
+        <button onclick="handleReloadAllData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <span class="material-symbols-outlined text-[16px]">sync</span>
+          <span>Segarkan Data</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dual Operations Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      
+      <!-- Panel 1: Verifikasi Penjamin Biaya (Admin Pendaftaran) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="font-display text-base font-bold text-on-surface">Verifikasi Berkas Klaim Penjamin</h3>
+            <p class="text-xs text-secondary">Validasi pra-otorisasi asuransi swasta sebelum konsultasi poli</p>
+          </div>
+          <span id="verif-pending-badge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">
+            1 Perlu Tindakan
+          </span>
+        </div>
+
+        <div id="admin-verification-list" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Panel 2: Antrian Dispensing Obat (Depo Farmasi) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="font-display text-base font-bold text-on-surface">Antrian Dispensing Obat Digital</h3>
+            <p class="text-xs text-secondary">Resep elektronik yang terkirim langsung dari poliklinik spesialis</p>
+          </div>
+          <span id="pharmacy-active-badge" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">
+            2 Resep Aktif
+          </span>
+        </div>
+
+        <div id="pharmacy-orders-list" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Panel 3: Master Data Dokter & Kuota Layanan Poliklinik (Modul 4.6 PRD) -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div>
+          <h3 class="font-display text-base font-bold text-on-surface">Master Data Dokter Spesialis & Alokasi Kuota</h3>
+          <p class="text-xs text-secondary">Pengelolaan jadwal buka poli, kuota penjamin (Umum/BPJS/Asuransi), dan kredensial login</p>
+        </div>
+        <button onclick="openAddDoctorModal()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-primary border border-blue-200 text-xs font-bold rounded-lg transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          <span>Tambah Dokter</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-surface-container-low text-secondary uppercase font-semibold text-[10px] border-b border-slate-200">
+            <tr>
+              <th class="py-2.5 px-3">Nama Dokter & NIP</th>
+              <th class="py-2.5 px-3">Poliklinik & Ruangan</th>
+              <th class="py-2.5 px-3">Nomor SIP</th>
+              <th class="py-2.5 px-3 text-center">Kuota Harian (U / B / A)</th>
+              <th class="py-2.5 px-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="admin-doctors-table" class="divide-y divide-slate-100 text-slate-800">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: TAMBAH DOKTER BARU -->
+  <div id="modal-add-doctor" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold">
+            🩺
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-slate-900 text-sm sm:text-base">Pendaftaran Dokter Baru</h3>
+            <p class="text-[11px] text-slate-500">Master Data Tenaga Medis & Kredensial MFA SIMRS</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAddDoctorModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); submitAddDoctor();" class="space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Induk Pegawai (NIP Dokter) *</label>
+            <input type="text" id="add-doc-nip" required placeholder="Contoh: DOK-2026-008" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor SIP Dokter</label>
+            <input type="text" id="add-doc-sip" placeholder="SIP.440/150-Dinkes/2026" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar Spesialis *</label>
+          <input type="text" id="add-doc-name" required placeholder="Contoh: dr. Faisal Rasyid, Sp.A" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Poliklinik Tugas *</label>
+            <select id="add-doc-poli" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+              <option value="poli-int">Poliklinik Penyakit Dalam</option>
+              <option value="poli-ped">Poli Anak & Tumbuh Kembang</option>
+              <option value="poli-car">Poli Jantung & Pembuluh Darah</option>
+              <option value="poli-den">Poli Gigi & Mulut</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Ruangan Poliklinik *</label>
+            <input type="text" id="add-doc-room" required value="Ruang Poli 5 (Lantai 2)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+          </div>
+        </div>
+
+        <!-- Alokasi Kuota Penjamin PRD Modul 4.4 -->
+        <div class="p-3 bg-surface-container-low rounded-xl border border-slate-200 space-y-2">
+          <label class="block text-xs font-bold text-slate-800">Alokasi Kuota Pasien per Hari (Triage Finansial):</label>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <span class="block text-[10px] text-blue-700 font-bold uppercase mb-0.5">Umum</span>
+              <input type="number" id="add-doc-kuota-umum" value="10" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-blue-300 text-center font-bold">
+            </div>
+            <div>
+              <span class="block text-[10px] text-emerald-700 font-bold uppercase mb-0.5">BPJS</span>
+              <input type="number" id="add-doc-kuota-bpjs" value="15" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-emerald-300 text-center font-bold">
+            </div>
+            <div>
+              <span class="block text-[10px] text-amber-700 font-bold uppercase mb-0.5">Asuransi</span>
+              <input type="number" id="add-doc-kuota-asuransi" value="5" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-amber-300 text-center font-bold">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Default *</label>
+            <input type="password" id="add-doc-password" required value="dokter123" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kode Master TOTP MFA</label>
+            <input type="text" id="add-doc-totp" value="123456" readonly class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 font-mono text-center font-bold">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeAddDoctorModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-container text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
+            <span>Simpan Dokter ke SIMRS</span>
+            <span class="material-symbols-outlined text-[16px]">check</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  </div>
+
+</section>
+

@@ -1,0 +1,114 @@
+<!-- GOOGLE FONTS & MATERIAL SYMBOLS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+<!-- TAILWIND CSS CDN & CONFIGURATION SESUAI DESIGN.MD MAHARDIKA CLINICAL CORE -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#004e99",
+          "primary-container": "#0a66c2",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#dbe6ff",
+          "inverse-primary": "#a8c8ff",
+          "secondary": "#565e74",
+          "secondary-container": "#dae2fd",
+          "tertiary": "#015d15",
+          "tertiary-container": "#26762c",
+          "tertiary-fixed": "#a3f69c",
+          "tertiary-fixed-dim": "#88d982",
+          "on-tertiary-fixed": "#002204",
+          "surface": "#f8f9ff",
+          "surface-bright": "#f8f9ff",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#eff4ff",
+          "surface-container": "#e5eeff",
+          "surface-container-high": "#dce9ff",
+          "surface-container-highest": "#d3e4fe",
+          "on-surface": "#0b1c30",
+          "on-surface-variant": "#414752",
+          "inverse-surface": "#213145",
+          "inverse-on-surface": "#eaf1ff",
+          "outline": "#727783",
+          "outline-variant": "#c1c6d4",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "on-error": "#ffffff"
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Plus Jakarta Sans', 'sans-serif'],
+          mono: ['Courier Prime', 'monospace']
+        },
+        borderRadius: {
+          'xl': '0.75rem',
+          '2xl': '1rem',
+          '3xl': '1.5rem'
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  /* Base & Scrollbar Rules */
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9ff;
+    color: #0b1c30;
+  }
+  
+  h1, h2, h3, .font-display {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  /* Custom Guarantor Badges from DESIGN.md */
+  .chip-bpjs {
+    background-color: #E8F5E9;
+    color: #1B5E20;
+    border: 1px solid #A5D6A7;
+  }
+  .chip-umum {
+    background-color: #E0F2FE;
+    color: #075985;
+    border: 1px solid #7DD3FC;
+  }
+  .chip-asuransi {
+    background-color: #FFF3E0;
+    color: #B23C00;
+    border: 1px solid #FFCC80;
+  }
+
+  /* Material Symbols styling */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+  .material-symbols-fill {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+
+  /* Print Styling for Kiosk Ticket */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #printable-ticket, #printable-ticket * {
+      visibility: visible;
+    }
+    #printable-ticket {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 80mm;
+    }
+  }
+</style>
+

@@ -1,0 +1,13 @@
+# Dependencies & Cache
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# Vercel Environment & Cache
+.vercel/
+
+# Temporary / Scratch Files
+.tmp/
+*.tmp
+

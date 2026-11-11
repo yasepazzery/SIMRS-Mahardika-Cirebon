@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SIMRS RS Mahardika Cirebon - Local Live Preview</title>
+  
+  <!-- GOOGLE FONTS & MATERIAL SYMBOLS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  <!-- TAILWIND CSS CDN & CONFIGURATION SESUAI DESIGN.MD MAHARDIKA CLINICAL CORE -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004e99",
+            "primary-container": "#0a66c2",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#dbe6ff",
+            "inverse-primary": "#a8c8ff",
+            "secondary": "#565e74",
+            "secondary-container": "#dae2fd",
+            "tertiary": "#015d15",
+            "tertiary-container": "#26762c",
+            "tertiary-fixed": "#a3f69c",
+            "tertiary-fixed-dim": "#88d982",
+            "on-tertiary-fixed": "#002204",
+            "surface": "#f8f9ff",
+            "surface-bright": "#f8f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d3e4fe",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#414752",
+            "inverse-surface": "#213145",
+            "inverse-on-surface": "#eaf1ff",
+            "outline": "#727783",
+            "outline-variant": "#c1c6d4",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff"
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['Courier Prime', 'monospace']
+          },
+          borderRadius: {
+            'xl': '0.75rem',
+            '2xl': '1rem',
+            '3xl': '1.5rem'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9ff;
+      color: #0b1c30;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .chip-bpjs { background-color: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+    .chip-umum { background-color: #E0F2FE; color: #075985; border: 1px solid #7DD3FC; }
+    .chip-asuransi { background-color: #FFF3E0; color: #B23C00; border: 1px solid #FFCC80; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-ticket, #printable-ticket * { visibility: visible; }
+      #printable-ticket { position: absolute; left: 0; top: 0; width: 80mm; }
+    }
+  </style>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- ======================================================== -->
+  <!-- TOP PERSISTENT ROLE & SCREEN NAVIGATION BAR              -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateToView('kiosk')">
+        <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-lg shadow">
+          +
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display font-bold text-slate-900 text-sm sm:text-base leading-tight">RS Mahardika Cirebon</span>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.2 rounded-full">Pratinjau Live</span>
+          </div>
+          <p class="text-[10px] text-slate-500">APSI Praktikum SMT 5 • SIMRS PRD v1.2 Fullstack</p>
+        </div>
+      </div>
+
+      <!-- Quick Role / Screen Switcher Pills -->
+      <nav class="flex flex-wrap items-center bg-surface-container-low p-1 rounded-xl border border-slate-200 text-xs font-semibold gap-1">
+        <button id="nav-kiosk" onclick="navigateToView('kiosk')" class="top-nav-btn px-2.5 py-1.5 rounded-lg bg-primary-container text-white shadow-sm transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">touch_app</span>
+          <span>1. Kiosk Lobi</span>
+        </button>
+
+        <button id="nav-tv" onclick="navigateToView('tv')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">tv</span>
+          <span>2. TV Display (TTS)</span>
+        </button>
+
+        <button id="nav-doctor" onclick="navigateToView('doctor')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">stethoscope</span>
+          <span>3. Dokter & Resep</span>
+        </button>
+
+        <button id="nav-admin" onclick="navigateToView('admin')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">local_pharmacy</span>
+          <span>4. Admin & Farmasi</span>
+        </button>
+
+        <button id="nav-portal" onclick="navigateToView('portal')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">person</span>
+          <span>5. Portal Pasien</span>
+        </button>
+
+        <button id="nav-auth" onclick="navigateToView('auth')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">lock</span>
+          <span>6. Login / MFA</span>
+        </button>
+      </nav>
+
+      <!-- Status Mode Pill -->
+      <div class="hidden lg:flex items-center">
+        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-bold flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Audio Synthesizer Ready</span>
+        </span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN CONTAINER WITH ALL VIEWS                            -->
+  <!-- ======================================================== -->
+  <main class="flex-1 w-full">
+    
+    <!-- ==================== VIEW 1: KIOSK MANDIRI ==================== -->
+    <section id="view-kiosk" class="app-view py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)] flex flex-col justify-between">
+      <div class="max-w-7xl mx-auto w-full space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-inverse-surface text-inverse-on-surface p-4 rounded-2xl shadow-lg border border-slate-700">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-md">
+              <span class="material-symbols-outlined text-[28px] material-symbols-fill">local_hospital</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display text-lg sm:text-xl font-bold tracking-tight text-white">RS Mahardika Cirebon</h2>
+                <span class="px-2 py-0.5 rounded-full bg-tertiary text-white text-[10px] font-bold">KIOSK AKTIF</span>
+              </div>
+              <p class="text-xs text-slate-300">Anjungan Pendaftaran Mandiri (Kiosk 01 - Lobi Utama)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+            <span class="material-symbols-outlined text-blue-400 text-[20px]">schedule</span>
+            <div class="text-right">
+              <div class="font-display text-sm font-bold text-white" id="kiosk-live-clock">11 Nov 2026 | 08:45 WIB</div>
+              <div class="text-[10px] text-emerald-400 font-semibold">BPJS VClaim Online & SatuSehat Terhubung</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div class="flex items-center gap-2 bg-primary-container text-white p-3 rounded-xl shadow font-semibold">
+            <span class="w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center font-bold text-xs">1</span>
+            <span>Pilih Penjamin</span>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+            <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">2</span>
+            <span>Validasi Berkas</span>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+            <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">3</span>
+            <span>Pilih Dokter & Poli</span>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-200 text-slate-600 p-3 rounded-xl font-medium">
+            <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs">4</span>
+            <span>Cetak Tiket QR</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 space-y-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-display text-base font-bold text-on-surface">1. Sentuh Jenis Penjamin Biaya Anda:</h3>
+                <span class="text-xs bg-blue-50 text-primary px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">touch_app</span> Layar Sentuh Aktif
+                </span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div id="kiosk-card-umum" onclick="setKioskPenjamin('UMUM')" class="cursor-pointer border-2 border-slate-200 hover:border-blue-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2">
+                  <div class="w-12 h-12 mx-auto rounded-xl bg-blue-100 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[28px]">payments</span>
+                  </div>
+                  <h4 class="font-bold text-sm text-slate-900">PASIEN UMUM</h4>
+                  <span class="inline-block chip-umum text-[10px] font-bold px-2 py-0.5 rounded">Self-Pay / Mandiri</span>
+                  <p class="text-[11px] text-secondary">Pembayaran mandiri tunai, debit, atau QRIS.</p>
+                </div>
+                <div id="kiosk-card-bpjs" onclick="setKioskPenjamin('BPJS')" class="cursor-pointer border-2 border-emerald-500 ring-2 ring-emerald-300 rounded-xl p-4 transition bg-emerald-50/50 text-center space-y-2">
+                  <div class="w-12 h-12 mx-auto rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow">
+                    <span class="material-symbols-outlined text-[28px] material-symbols-fill">health_and_safety</span>
+                  </div>
+                  <h4 class="font-bold text-sm text-slate-900">BPJS KESEHATAN</h4>
+                  <span class="inline-block chip-bpjs text-[10px] font-bold px-2 py-0.5 rounded">Integrasi VClaim / SEP</span>
+                  <p class="text-[11px] text-emerald-900">Rujukan aktif dari Faskes 1 / Puskesmas.</p>
+                </div>
+                <div id="kiosk-card-asuransi" onclick="setKioskPenjamin('ASURANSI_SWASTA')" class="cursor-pointer border-2 border-slate-200 hover:border-amber-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2">
+                  <div class="w-12 h-12 mx-auto rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[28px]">verified_user</span>
+                  </div>
+                  <h4 class="font-bold text-sm text-slate-900">ASURANSI SWASTA</h4>
+                  <span class="inline-block chip-asuransi text-[10px] font-bold px-2 py-0.5 rounded">Pre-Authorization</span>
+                  <p class="text-[11px] text-secondary">Prudential, Allianz, Manulife, dll.</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="kiosk-dynamic-form" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4"></div>
+          </div>
+
+          <div class="lg:col-span-4 space-y-4">
+            <div class="bg-white p-5 rounded-2xl border-2 border-dashed border-slate-300 shadow-md text-center" id="printable-ticket">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Simulasi Tiket Fisik (Thermal Print)</span>
+              <div class="border-t-2 border-b-2 border-slate-900 py-4 my-2 font-mono">
+                <h4 class="font-bold text-base text-slate-900">RS MAHARDIKA CIREBON</h4>
+                <p class="text-[10px] text-slate-500">Jl. Brigjen Dharsono No. 45, Cirebon</p>
+                <div class="my-3">
+                  <span class="text-xs text-slate-500 block">NOMOR ANTRIAN POLI</span>
+                  <span id="ticket-number-display" class="text-4xl font-black text-primary tracking-wider font-mono">B-015</span>
+                </div>
+                <div class="my-2">
+                  <span id="ticket-badge-display" class="inline-block px-3 py-1 rounded font-bold text-xs chip-bpjs">
+                    PASIEN BPJS KESEHATAN
+                  </span>
+                </div>
+                <div class="text-left text-xs space-y-1 mt-3 pt-2 border-t border-dashed border-slate-300">
+                  <p><span class="text-slate-500">Poli:</span> <b id="ticket-poli-display">Poliklinik Penyakit Dalam</b></p>
+                  <p><span class="text-slate-500">Dokter:</span> <b id="ticket-doc-display">dr. Handoko, Sp.PD</b></p>
+                  <p><span class="text-slate-500">Lokasi:</span> <b id="ticket-room-display">Ruang Poli 2 (Lantai 1)</b></p>
+                  <p><span class="text-slate-500">Pasien:</span> <b id="ticket-patient-display">Ny. Siti Rahmawati</b></p>
+                  <p id="ticket-sep-row"><span class="text-slate-500">No. SEP:</span> <span id="ticket-sep-display" class="font-mono text-[11px] font-bold text-emerald-800">0115R0021126V000142</span></p>
+                </div>
+                <div class="mt-4 flex flex-col items-center">
+                  <div class="w-24 h-24 bg-slate-900 p-1.5 rounded-lg flex flex-col items-center justify-center text-[10px] text-white">
+                    <div class="grid grid-cols-4 gap-1 p-1 bg-white text-black font-bold">
+                      <span>■</span><span>□</span><span>■</span><span>■</span>
+                      <span>□</span><span>■</span><span>□</span><span>□</span>
+                      <span>■</span><span>□</span><span>■</span><span>□</span>
+                      <span>■</span><span>■</span><span>□</span><span>■</span>
+                    </div>
+                    <span class="text-[9px] mt-1 text-slate-300">SCAN DI POLI</span>
+                  </div>
+                  <p class="text-[10px] text-slate-500 mt-2 font-sans">Estimasi Dilayani: <span id="ticket-est-time">09:15 WIB</span></p>
+                </div>
+              </div>
+              <button onclick="window.print()" class="w-full mt-2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">print</span>
+                <span>Cetak Ulang Tiket Fisik</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: TV DISPLAY ==================== -->
+    <section id="view-tv" class="app-view hidden py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)] flex flex-col justify-between bg-slate-950 text-white">
+      <div class="max-w-7xl mx-auto w-full space-y-6">
+        <div class="bg-indigo-950/80 border border-indigo-500/40 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+          <div class="flex items-center gap-3">
+            <span class="relative flex h-3.5 w-3.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+            </span>
+            <div>
+              <h4 class="text-xs font-bold text-indigo-200 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">volume_up</span>
+                <span>Automated Voice Synthesizer (TTS Bahasa Indonesia Aktif)</span>
+              </h4>
+              <p id="tv-tts-preview" class="text-xs text-indigo-300 font-mono mt-0.5">
+                Format: "Nomor antrian B-015, Pasien BPJS, silakan menuju Poliklinik Penyakit Dalam..."
+              </p>
+            </div>
+          </div>
+          <button onclick="playCurrentActiveCallTTS()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg flex items-center gap-2 transition transform active:scale-95">
+            <span class="material-symbols-outlined text-[18px]">campaign</span>
+            <span>Uji Panggil Suara (Play TTS)</span>
+          </button>
+        </div>
+
+        <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">+</div>
+            <div>
+              <h1 class="font-display text-2xl font-black tracking-wide text-white">RS MAHARDIKA CIREBON</h1>
+              <p class="text-xs text-blue-400 font-semibold tracking-wider">SISTEM INFORMASI ANTRIAN POLIKLINIK TERPADU</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div id="tv-live-clock" class="text-2xl font-mono font-bold text-white">09:14:32 WIB</div>
+            <p class="text-xs text-slate-400">Rabu, 11 November 2026</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div class="lg:col-span-7 bg-gradient-to-br from-slate-900 to-slate-850 border-2 border-blue-500/80 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="px-3.5 py-1 bg-red-600 text-white text-xs font-black uppercase rounded-full animate-pulse tracking-wider flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-white"></span>
+                  SEDANG DIPANGGIL
+                </span>
+                <span class="text-xs font-bold text-blue-400 font-mono">LOKET POLIKLINIK AKTIF</span>
+              </div>
+              <div class="text-center py-6 bg-slate-950/70 rounded-2xl border border-slate-800 my-2">
+                <span class="text-xs text-slate-400 uppercase tracking-widest block mb-1">NOMOR ANTRIAN</span>
+                <div id="tv-active-ticket" class="text-6xl sm:text-7xl font-black text-yellow-400 tracking-wider font-mono drop-shadow-[0_4px_16px_rgba(250,204,21,0.35)]">
+                  B-015
+                </div>
+                <div class="mt-3">
+                  <span id="tv-active-penjamin" class="inline-block px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50">
+                    PASIEN BPJS KESEHATAN
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-blue-950/40 border border-blue-800/60 rounded-2xl p-4 mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <span class="text-xs text-blue-300 block font-semibold">TUJUAN POLIKLINIK:</span>
+                <h3 id="tv-active-poli" class="text-lg font-black text-white mt-0.5">POLIKLINIK PENYAKIT DALAM</h3>
+                <p id="tv-active-room" class="text-xs text-slate-300 mt-0.5">Ruang Poli 2 (Lantai 1)</p>
+              </div>
+              <div class="border-l border-blue-800/60 pl-4">
+                <span class="text-xs text-blue-300 block font-semibold">DOKTER PEMERIKSA:</span>
+                <h3 id="tv-active-doc" class="text-lg font-bold text-white mt-0.5">dr. Handoko, Sp.PD</h3>
+                <p class="text-xs text-emerald-400 mt-0.5 flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Status: Siap Melayani
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">STATUS POLIKLINIK LAINNYA</h4>
+              <span class="text-[10px] text-slate-500 font-mono">UPDATE OTOMATIS</span>
+            </div>
+            <div id="tv-other-clinics-list" class="space-y-3"></div>
+            <div class="bg-slate-900 border border-purple-500/50 rounded-2xl p-3.5 flex items-center justify-between shadow-lg">
+              <div>
+                <p class="text-xs font-bold text-purple-300">Loket Pengambilan Obat Farmasi</p>
+                <p class="text-[11px] text-slate-400">Depo Farmasi Lt. 1</p>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-bold font-mono text-purple-400">F-029</span>
+                <span class="block text-[10px] text-purple-300 font-semibold">LOKET 1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center gap-3 text-xs bg-slate-900/60 px-4 py-2.5 rounded-xl">
+          <span class="bg-primary text-white font-bold px-2 py-0.5 rounded text-[10px] uppercase whitespace-nowrap">INFO RS:</span>
+          <div class="overflow-hidden whitespace-nowrap text-slate-300 text-xs">
+            Selamat datang di RS Mahardika Cirebon. Pasien BPJS wajib membawa KTP asli dan rujukan Faskes 1 aktif. Harap menjaga ketenangan di ruang tunggu.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: DOKTER ==================== -->
+    <section id="view-doctor" class="app-view hidden py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)]">
+      <div class="max-w-7xl mx-auto w-full space-y-6">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow">
+              <span class="material-symbols-outlined text-[28px]">stethoscope</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display text-lg font-bold text-slate-900" id="doc-name-header">dr. Handoko, Sp.PD</h2>
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Poli Buka
+                </span>
+              </div>
+              <p class="text-xs text-secondary">Spesialis Penyakit Dalam • Ruang Poli 2 (Lantai 1) • SIP.440/129-Dinkes</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-1.5 text-center">
+              <span class="block text-[10px] text-blue-700 font-bold uppercase">Umum</span>
+              <span class="font-mono font-bold text-blue-900 text-sm" id="quota-umum">8 / 10</span>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 text-center">
+              <span class="block text-[10px] text-emerald-700 font-bold uppercase">BPJS</span>
+              <span class="font-mono font-bold text-emerald-900 text-sm" id="quota-bpjs">14 / 15</span>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl px-3 py-1.5 text-center">
+              <span class="block text-[10px] text-amber-700 font-bold uppercase">Asuransi</span>
+              <span class="font-mono font-bold text-amber-900 text-sm" id="quota-asuransi">3 / 5</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-3 bg-surface-container-low border-b border-slate-200 flex gap-2">
+              <button onclick="handleDoctorCallActive()" class="flex-1 py-2 bg-primary hover:bg-primary-container text-white rounded-xl text-xs font-bold shadow flex items-center justify-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[16px]">campaign</span>
+                <span>Panggil Suara (TTS)</span>
+              </button>
+              <button onclick="handleDoctorRecall()" class="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold">
+                Panggil Ulang
+              </button>
+              <button onclick="handleDoctorComplete()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow">
+                Selesai
+              </button>
+            </div>
+            <div id="doctor-queue-list" class="divide-y divide-slate-100 max-h-[520px] overflow-y-auto"></div>
+          </div>
+
+          <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+              <div>
+                <h3 class="font-display text-base font-bold text-on-surface">Formulir Peresepan Digital (E-Prescription)</h3>
+                <p class="text-xs text-secondary">Pasien Aktif: <b id="rx-patient-label" class="text-slate-900">Ny. Siti Rahmawati</b> (<span id="rx-penjamin-label" class="text-emerald-700 font-bold">BPJS</span>)</p>
+              </div>
+              <span class="text-xs bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg font-mono font-bold" id="rx-number-preview">
+                #RX-20261111-008
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Diagnosis Utama (ICD-10)</label>
+                <input type="text" id="rx-diagnosis" value="E11.9 - Type 2 diabetes mellitus without complications" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-surface-container-low">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Riwayat Alergi Obat Pasien</label>
+                <input type="text" id="rx-allergy" value="Tidak Ada Alergi (NKDA)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-surface-container-low text-emerald-800 font-semibold">
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-semibold text-slate-700">Daftar Obat yang Diresepkan:</label>
+                <span class="text-[11px] text-primary font-bold">Katalog Formularium RS Terhubung</span>
+              </div>
+              <div id="rx-items-container" class="space-y-2">
+                <div class="p-3 rounded-xl bg-surface-container-low border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div class="flex-1 min-w-[200px]">
+                    <p class="font-bold text-slate-900 rx-item-name">Metformin HCl 500 mg Tablet</p>
+                    <p class="text-[11px] text-slate-500">Kategori: Fornas BPJS • Sediaan: Tablet</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="bg-white px-2 py-1 border rounded text-[11px] font-mono rx-item-dosage">3 x 1 Hari (Sesudah Makan)</span>
+                    <span class="font-bold text-slate-800 rx-item-qty">60 Tab</span>
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700">✕</button>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div class="flex-1 min-w-[200px]">
+                    <p class="font-bold text-slate-900 rx-item-name">Glimepiride 2 mg Tablet</p>
+                    <p class="text-[11px] text-slate-500">Kategori: Fornas BPJS • Sediaan: Tablet</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="bg-white px-2 py-1 border rounded text-[11px] font-mono rx-item-dosage">1 x 1 Hari (Pagi Hari)</span>
+                    <span class="font-bold text-slate-800 rx-item-qty">30 Tab</span>
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700">✕</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" onclick="handleAddRxItemPrompt()" class="mt-2 w-full py-2 border-2 border-dashed border-slate-300 hover:border-primary text-slate-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                <span>+ Tambah Obat Baru dari Master Formularium</span>
+              </button>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan untuk Apoteker & Pasien</label>
+              <textarea id="rx-notes" rows="2" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 bg-surface-container-low">Cek gula darah puasa berkala 1 bulan lagi. Hindari makanan manis berlebih.</textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-200 flex flex-wrap justify-between items-center gap-3">
+              <button type="button" onclick="alert('Pratinjau Resep Elektronik PDF RS Mahardika siap diunduh.')" class="px-3 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50">
+                Pratinjau PDF Resep
+              </button>
+              <button type="button" onclick="handleDoctorSubmitPrescription()" class="px-5 py-2.5 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2 transition">
+                <span class="material-symbols-outlined text-[18px]">send</span>
+                <span>Terbitkan & Kirim ke Farmasi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: ADMIN & FARMASI ==================== -->
+    <section id="view-admin" class="app-view hidden py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)]">
+      <div class="max-w-7xl mx-auto w-full space-y-6">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-secondary text-white flex items-center justify-center font-bold text-xl shadow">
+              <span class="material-symbols-outlined text-[28px]">admin_panel_settings</span>
+            </div>
+            <div>
+              <h2 class="font-display text-lg font-bold text-slate-900">SIMRS Mahardika | Panel Administrasi & Farmasi</h2>
+              <p class="text-xs text-secondary">Verifikasi Penjamin Biaya (Admisi) & Antrian Dispensing Obat (Depo Farmasi)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openAddDoctorModal()" class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg shadow-sm flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[16px]">person_add</span>
+              <span>+ Tambah Dokter Baru</span>
+            </button>
+            <button onclick="handleReloadAllData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[16px]">sync</span>
+              <span>Segarkan Data</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+              <div>
+                <h3 class="font-display text-base font-bold text-on-surface">Verifikasi Berkas Klaim Penjamin</h3>
+                <p class="text-xs text-secondary">Validasi pra-otorisasi asuransi swasta sebelum konsultasi poli</p>
+              </div>
+              <span id="verif-pending-badge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                1 Perlu Tindakan
+              </span>
+            </div>
+            <div id="admin-verification-list" class="space-y-3"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+              <div>
+                <h3 class="font-display text-base font-bold text-on-surface">Antrian Dispensing Obat Digital</h3>
+                <p class="text-xs text-secondary">Resep elektronik yang terkirim langsung dari poliklinik spesialis</p>
+              </div>
+              <span id="pharmacy-active-badge" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                2 Resep Aktif
+              </span>
+            </div>
+            <div id="pharmacy-orders-list" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Master Data Dokter & Kuota Layanan Poliklinik (Modul 4.6 PRD) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+            <div>
+              <h3 class="font-display text-base font-bold text-on-surface">Master Data Dokter Spesialis & Alokasi Kuota</h3>
+              <p class="text-xs text-secondary">Pengelolaan jadwal buka poli, kuota penjamin (Umum/BPJS/Asuransi), dan kredensial login</p>
+            </div>
+            <button onclick="openAddDoctorModal()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-primary border border-blue-200 text-xs font-bold rounded-lg transition flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">add_circle</span>
+              <span>Tambah Dokter</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-surface-container-low text-secondary uppercase font-semibold text-[10px] border-b border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-3">Nama Dokter & NIP</th>
+                  <th class="py-2.5 px-3">Poliklinik & Ruangan</th>
+                  <th class="py-2.5 px-3">Nomor SIP</th>
+                  <th class="py-2.5 px-3 text-center">Kuota Harian (U / B / A)</th>
+                  <th class="py-2.5 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-doctors-table" class="divide-y divide-slate-100 text-slate-800">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: TAMBAH DOKTER BARU -->
+      <div id="modal-add-doctor" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold">🩺</div>
+              <div>
+                <h3 class="font-display font-bold text-slate-900 text-sm sm:text-base">Pendaftaran Dokter Baru</h3>
+                <p class="text-[11px] text-slate-500">Master Data Tenaga Medis & Kredensial MFA SIMRS</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeAddDoctorModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+          </div>
+
+          <form onsubmit="event.preventDefault(); submitAddDoctor();" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Induk Pegawai (NIP Dokter) *</label>
+                <input type="text" id="add-doc-nip" required placeholder="Contoh: DOK-2026-008" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor SIP Dokter</label>
+                <input type="text" id="add-doc-sip" placeholder="SIP.440/150-Dinkes/2026" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar Spesialis *</label>
+              <input type="text" id="add-doc-name" required placeholder="Contoh: dr. Faisal Rasyid, Sp.A" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Poliklinik Tugas *</label>
+                <select id="add-doc-poli" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                  <option value="poli-int">Poliklinik Penyakit Dalam</option>
+                  <option value="poli-ped">Poli Anak & Tumbuh Kembang</option>
+                  <option value="poli-car">Poli Jantung & Pembuluh Darah</option>
+                  <option value="poli-den">Poli Gigi & Mulut</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Ruangan Poliklinik *</label>
+                <input type="text" id="add-doc-room" required value="Ruang Poli 5 (Lantai 2)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+              </div>
+            </div>
+
+            <div class="p-3 bg-surface-container-low rounded-xl border border-slate-200 space-y-2">
+              <label class="block text-xs font-bold text-slate-800">Alokasi Kuota Pasien per Hari (Triage Finansial):</label>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <span class="block text-[10px] text-blue-700 font-bold uppercase mb-0.5">Umum</span>
+                  <input type="number" id="add-doc-kuota-umum" value="10" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-blue-300 text-center font-bold">
+                </div>
+                <div>
+                  <span class="block text-[10px] text-emerald-700 font-bold uppercase mb-0.5">BPJS</span>
+                  <input type="number" id="add-doc-kuota-bpjs" value="15" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-emerald-300 text-center font-bold">
+                </div>
+                <div>
+                  <span class="block text-[10px] text-amber-700 font-bold uppercase mb-0.5">Asuransi</span>
+                  <input type="number" id="add-doc-kuota-asuransi" value="5" min="1" max="50" class="w-full text-xs px-2 py-1.5 rounded border border-amber-300 text-center font-bold">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Default *</label>
+                <input type="password" id="add-doc-password" required value="dokter123" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kode Master TOTP MFA</label>
+                <input type="text" id="add-doc-totp" value="123456" readonly class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 font-mono text-center font-bold">
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+              <button type="button" onclick="closeAddDoctorModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-container text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
+                <span>Simpan Dokter ke SIMRS</span>
+                <span class="material-symbols-outlined text-[16px]">check</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: PORTAL PASIEN ==================== -->
+    <section id="view-portal" class="app-view hidden py-6 px-4 sm:px-6 min-h-[calc(100vh-5rem)]">
+      <div class="max-w-7xl mx-auto w-full space-y-6">
+        <div class="bg-gradient-to-r from-primary to-primary-container text-white p-5 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl font-bold">
+              <span class="material-symbols-outlined text-[32px]">account_circle</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display text-lg sm:text-xl font-bold text-white">Ny. Siti Rahmawati</h2>
+                <span class="bg-emerald-500/30 text-emerald-100 border border-emerald-300/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  BPJS AKTIF
+                </span>
+              </div>
+              <p class="text-xs text-blue-100 mt-0.5">No. Rekam Medis: #RM-2026-8812 • NIK: 3274012803890002 • Faskes: Kesambi</p>
+            </div>
+          </div>
+          <button onclick="navigateToView('kiosk')" class="px-3.5 py-2 bg-white text-primary rounded-xl font-bold text-xs shadow hover:bg-blue-50 transition flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">add_circle</span>
+            <span>Daftar Antrian Baru</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 class="font-display text-sm font-bold text-on-surface flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[20px]">confirmation_number</span>
+                <span>Tiket Antrian Digital Anda</span>
+              </h3>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">HARI INI</span>
+            </div>
+            <div class="bg-surface-container-low rounded-2xl p-5 border border-slate-200 text-center space-y-3">
+              <span class="text-xs text-secondary uppercase font-bold tracking-wider">NOMOR ANTRIAN POLIKLINIK</span>
+              <div class="text-5xl font-black font-mono text-primary">B-015</div>
+              <span class="inline-block chip-bpjs text-xs font-bold px-3 py-1 rounded-full">PASIEN BPJS KESEHATAN</span>
+              <div class="text-left text-xs bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                <p><span class="text-secondary">Poli Tujuan:</span> <b>Poliklinik Penyakit Dalam</b></p>
+                <p><span class="text-secondary">Dokter:</span> <b>dr. Handoko, Sp.PD</b></p>
+                <p><span class="text-secondary">Lokasi:</span> <b>Ruang Poli 2 (Lantai 1)</b></p>
+                <p><span class="text-secondary">No. SEP:</span> <span class="font-mono text-emerald-700 font-bold">0115R0021126V000142</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 class="font-display text-sm font-bold text-on-surface flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[20px]">prescriptions</span>
+                <span>Riwayat Resep Obat Medis Digital (E-Rx)</span>
+              </h3>
+              <span class="text-xs text-secondary">Tersinkronisasi Kemenkes SatuSehat</span>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-container-low border border-slate-200 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-xs text-primary">#RX-20261111-008</span>
+                  <span class="chip-bpjs text-[10px] font-bold px-2 py-0.2 rounded">BPJS</span>
+                </div>
+                <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                  Sedang Diracik di Farmasi
+                </span>
+              </div>
+              <p class="text-xs text-slate-700"><b>dr. Handoko, Sp.PD</b> • Poliklinik Penyakit Dalam</p>
+              <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs space-y-1">
+                <p class="font-semibold text-slate-800">• Metformin HCl 500 mg Tablet (60 Tab) — 3x1 Hari Sesudah Makan</p>
+                <p class="font-semibold text-slate-800">• Glimepiride 2 mg Tablet (30 Tab) — 1x1 Hari Pagi Hari</p>
+              </div>
+              <div class="flex justify-between items-center pt-1 text-xs">
+                <span class="text-[11px] text-slate-500 font-mono">11 Nov 2026 09:22 WIB</span>
+                <button onclick="alert('Mengunduh Salinan Resep Medis Digital PDF...')" class="px-3 py-1.5 bg-primary hover:bg-primary-container text-white font-semibold rounded-lg shadow-sm transition flex items-center gap-1 text-[11px]">
+                  <span class="material-symbols-outlined text-[14px]">download</span>
+                  <span>Unduh PDF Resep</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 6: LOGIN & MFA ==================== -->
+    <section id="view-auth" class="app-view hidden py-6 px-4 sm:px-6 flex flex-col items-center justify-center min-h-[calc(100vh-5rem)]">
+      <div class="w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8">
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-md mb-3">
+            <span class="material-symbols-outlined text-[32px] material-symbols-fill">local_hospital</span>
+          </div>
+          <h1 class="font-display text-2xl font-bold text-on-surface">SIMRS RS Mahardika Cirebon</h1>
+          <p class="text-xs sm:text-sm text-secondary mt-0.5">Pintu Masuk Terpadu Layanan Rumah Sakit</p>
+        </div>
+
+        <div class="p-1 rounded-xl bg-surface-container-low flex items-center mb-6 border border-slate-200">
+          <button id="auth-tab-patient" onclick="switchAuthTab('patient')" class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">person</span>
+            <span>Portal Pasien</span>
+          </button>
+          <button id="auth-tab-staff" onclick="switchAuthTab('staff')" class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">stethoscope</span>
+            <span>Dokter & Staf Medis</span>
+          </button>
+        </div>
+
+        <div id="auth-form-patient" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">NIK (KTP) / No. WhatsApp / Email</label>
+            <input type="text" id="login-patient-id" value="3274012803890002" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm bg-surface-container-lowest">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Kata Sandi</label>
+            <input type="password" id="login-patient-pass" value="pasien123" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm bg-surface-container-lowest">
+          </div>
+          <button type="button" onclick="handleAuthSubmit('patient')" class="w-full py-2.5 bg-primary hover:bg-primary-container text-white font-bold text-xs sm:text-sm rounded-lg shadow transition">
+            Masuk ke Portal Pasien
+          </button>
+          <button type="button" onclick="handleSendOTP()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold text-xs rounded-lg transition">
+            💬 Kirim Kode OTP via WhatsApp
+          </button>
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between text-xs mt-3">
+            <div>
+              <p class="font-bold text-blue-900">Belum Punya Nomor Rekam Medis?</p>
+              <p class="text-blue-700 text-[11px]">Daftar mandiri sebagai pasien baru.</p>
+            </div>
+            <button type="button" onclick="openPatientRegisterModal()" class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white font-bold rounded-lg shadow-sm transition text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">person_add</span>
+              <span>Daftar Pasien Baru</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODAL: REGISTRASI PASIEN BARU MANDIRI -->
+        <div id="modal-register-patient" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold">+</div>
+                <div>
+                  <h3 class="font-display font-bold text-slate-900 text-sm sm:text-base">Registrasi Pasien Baru</h3>
+                  <p class="text-[11px] text-slate-500">Penerbitan Nomor Rekam Medis Elektronik Mandiri</p>
+                </div>
+              </div>
+              <button type="button" onclick="closePatientRegisterModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+            </div>
+
+            <form onsubmit="event.preventDefault(); submitPatientRegister();" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Induk Kependudukan (NIK KTP) *</label>
+                <input type="text" id="reg-patient-nik" required maxlength="16" placeholder="Contoh: 3274012803890005" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap (Sesuai KTP) *</label>
+                <input type="text" id="reg-patient-name" required placeholder="Contoh: Ahmad Fauzi Prasetyo" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Lahir *</label>
+                  <input type="date" id="reg-patient-birth" required value="1995-05-12" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin *</label>
+                  <select id="reg-patient-gender" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                    <option value="L">Laki-Laki</option>
+                    <option value="P">Perempuan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP Aktif *</label>
+                  <input type="tel" id="reg-patient-phone" required placeholder="08123456789" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Penjamin Utama</label>
+                  <select id="reg-patient-penjamin" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                    <option value="BPJS">BPJS Kesehatan</option>
+                    <option value="UMUM">Umum (Self-Pay)</option>
+                    <option value="ASURANSI_SWASTA">Asuransi Swasta</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Akun Baru *</label>
+                <input type="password" id="reg-patient-password" required value="pasien123" placeholder="Minimal 6 karakter" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+              </div>
+
+              <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-600 material-symbols-fill">verified</span>
+                <span>Nomor Rekam Medis (No. RM) akan otomatis digenerate dan tersimpan permanen.</span>
+              </div>
+
+              <div class="pt-2 flex justify-end gap-2">
+                <button type="button" onclick="closePatientRegisterModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Batal</button>
+                <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-container text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
+                  <span>Simpan & Terbitkan No. RM</span>
+                  <span class="material-symbols-outlined text-[16px]">check</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="auth-form-staff" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Nomor Induk Pegawai (NIP / ID Karyawan)</label>
+            <input type="text" id="login-staff-nip" value="DOK-1988-004" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm bg-surface-container-lowest">
+            <span class="text-[10px] text-slate-500 mt-0.5 block">Demo Dokter: <b>DOK-1988-004</b> | Admin Farmasi: <b>ADM-012</b></span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Kata Sandi Petugas</label>
+            <input type="password" id="login-staff-pass" value="dokter123" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm bg-surface-container-lowest">
+          </div>
+          <div class="p-3 bg-amber-50 border border-amber-300 rounded-xl space-y-1.5">
+            <div class="flex items-center gap-1.5 text-amber-900 text-xs font-bold">
+              <span class="material-symbols-outlined text-[18px] text-amber-700">shield_lock</span>
+              <span>Verifikasi Dua Langkah (MFA TOTP)</span>
+            </div>
+            <p class="text-[11px] text-amber-800">Kode Google Authenticator (Kode Demo: <b>123456</b>):</p>
+            <input type="text" maxlength="6" id="login-staff-totp" value="123456" class="w-full text-center tracking-[0.4em] font-mono text-base font-black px-3 py-1.5 rounded-lg border-2 border-amber-400 bg-white">
+          </div>
+          <button type="button" onclick="handleAuthSubmit('staff')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition">
+            Verifikasi & Masuk Dashboard Internal
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER                                                   -->
+  <!-- ======================================================== -->
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>© 2026 RS Mahardika Cirebon. Sistem Informasi Manajemen Rumah Sakit (SIMRS) Terintegrasi BPJS VClaim & SatuSehat.</p>
+      <p class="font-mono text-[11px] text-slate-400">Pratinjau Mandiri (Bisa Dijalankan Offline / di Browser)</p>
+    </div>
+  </footer>
+
+  <!-- CLIENT LOGIC & REAL AUDIO TTS ENGINE -->
+  <script>
+    var currentView = 'kiosk';
+    var selectedGuarantor = 'BPJS';
+
+    var localMockState = {
+      activeCall: {
+        ticketNumber: "B-015",
+        patientName: "Ny. Siti Rahmawati",
+        penjamin: "BPJS",
+        penjaminLabel: "PASIEN BPJS KESEHATAN",
+        poliName: "POLIKLINIK PENYAKIT DALAM",
+        room: "Ruang Poli 2 (Lantai 1)",
+        doctorName: "dr. Handoko, Sp.PD",
+        callTime: "09:14:32",
+        ttsText: "Nomor antrian B-015, Pasien BPJS, silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2."
+      },
+      queues: [
+        { id: "q-01", ticketNumber: "B-015", penjamin: "BPJS", patientName: "Ny. Siti Rahmawati", age: 46, status: "SEDANG_DIPERIKSA", no_rm: "#RM-2026-8812", doctorId: "doc-001", time: "09:10" },
+        { id: "q-02", ticketNumber: "U-009", penjamin: "UMUM", patientName: "Tn. Bambang Wijaya", age: 38, status: "MENUNGGU", no_rm: "#RM-2026-9041", doctorId: "doc-001", time: "09:20" },
+        { id: "q-03", ticketNumber: "A-004", penjamin: "ASURANSI_SWASTA", insuranceName: "PRUDENTIAL", patientName: "Ny. Jessica Melina", age: 29, status: "MENUNGGU", no_rm: "#RM-2026-9118", doctorId: "doc-001", time: "09:35" }
+      ],
+      otherClinics: [
+        { poli: "Poli Anak & Tumbuh Kembang", doctor: "dr. Anita Lestari, Sp.A (Ruang 1)", currentTicket: "A-008", penjamin: "UMUM" },
+        { poli: "Poli Jantung & Pembuluh Darah", doctor: "dr. Budi Santoso, Sp.JP (Ruang 3)", currentTicket: "C-004", penjamin: "ASURANSI" },
+        { poli: "Poli Gigi & Mulut", doctor: "drg. Citra Dewi (Ruang 4)", currentTicket: "B-011", penjamin: "BPJS" }
+      ],
+      prescriptions: [
+        { id: "rx-008", prescriptionNumber: "#RX-20261111-008", patientName: "Ny. Siti Rahmawati", doctorName: "dr. Handoko, Sp.PD", penjamin: "BPJS", items: [{ name: "Metformin HCl 500 mg Tablet (60 tab)" }, { name: "Glimepiride 2 mg Tablet (30 tab)" }], status: "SEDANG_DIRACIK", createdAt: "09:22 WIB" },
+        { id: "rx-007", prescriptionNumber: "#RX-20261111-007", patientName: "Tn. Dedi Kusnadi", doctorName: "dr. Anita Lestari, Sp.A", penjamin: "UMUM", items: [{ name: "Amoxicillin Sirup 125mg/5ml (1 btl)" }], status: "SIAP_DISERAHKAN", createdAt: "09:05 WIB" }
+      ],
+      verifications: [
+        { id: "ver-01", patientName: "Ny. Jessica Melina", penjamin: "ASURANSI_SWASTA", insuranceCompany: "Prudential Life Assurance", policyNumber: "PRU-9921820", documentType: "Scan Kartu Asuransi & Pengantar Dokter", status: "PENDING", submittedAt: "10 menit lalu" },
+        { id: "ver-02", patientName: "Ny. Siti Rahmawati", penjamin: "BPJS", insuranceCompany: "BPJS Kesehatan", policyNumber: "0001892837461", documentType: "Surat Rujukan Puskesmas Kesambi", status: "TERVERIFIKASI", submittedAt: "25 menit lalu" }
+      ],
+      quotas: { umum: { current: 8, max: 10 }, bpjs: { current: 14, max: 15 }, asuransi: { current: 3, max: 5 } }
+    };
+
+    function callServer(action, payload, callback) {
+      setTimeout(function() {
+        if (action === 'getQueueState') callback({ success: true, activeCall: localMockState.activeCall, otherClinics: localMockState.otherClinics, queues: localMockState.queues });
+        else if (action === 'getDoctorData') callback({ success: true, quotas: localMockState.quotas, activePatient: localMockState.queues.find(q=>q.status==='SEDANG_DIPERIKSA'), waitingList: localMockState.queues.filter(q=>q.status==='MENUNGGU') });
+        else if (action === 'callTicket') {
+          var target = localMockState.queues.find(q=>q.ticketNumber===payload.ticketNumber) || localMockState.queues[0];
+          target.status = 'SEDANG_DIPERIKSA';
+          var penjLabel = target.penjamin === 'BPJS' ? 'Pasien BPJS' : (target.penjamin === 'ASURANSI_SWASTA' ? 'Pasien Asuransi Swasta' : 'Pasien Umum');
+          localMockState.activeCall = {
+            ticketNumber: target.ticketNumber,
+            patientName: target.patientName,
+            penjamin: target.penjamin,
+            penjaminLabel: penjLabel.toUpperCase(),
+            poliName: "POLIKLINIK PENYAKIT DALAM",
+            room: "Ruang Poli 2 (Lantai 1)",
+            doctorName: "dr. Handoko, Sp.PD",
+            callTime: new Date().toLocaleTimeString('id-ID'),
+            ttsText: "Nomor antrian " + target.ticketNumber + ", " + penjLabel + ", silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2."
+          };
+          callback({ success: true, activeCall: localMockState.activeCall, message: 'Antrian ' + target.ticketNumber + ' berhasil dipanggil!' });
+        }
+        else if (action === 'takeTicket') {
+          var pref = payload.penjamin === 'BPJS' ? 'B-' : (payload.penjamin === 'ASURANSI_SWASTA' ? 'A-' : 'U-');
+          var num = pref + '0' + (localMockState.queues.length + 1);
+          var sep = payload.penjamin === 'BPJS' ? '0115R0021126V' + Math.floor(100000 + Math.random() * 900000) : null;
+          var auth = payload.penjamin === 'ASURANSI_SWASTA' ? 'AUTH-' + Math.floor(10000 + Math.random() * 90000) : null;
+          var newQ = { id: 'q-' + Date.now(), ticketNumber: num, penjamin: payload.penjamin, patientName: payload.patientName || 'Pasien Mandiri', age: 35, status: 'MENUNGGU', no_rm: '#RM-2026-' + Math.floor(1000+Math.random()*9000), doctorId: 'doc-001', sepNumber: sep, preAuthCode: auth };
+          localMockState.queues.push(newQ);
+          callback({ success: true, ticket: newQ, poliName: 'Poliklinik Penyakit Dalam', doctorName: 'dr. Handoko, Sp.PD', room: 'Ruang Poli 2 (Lantai 1)', message: 'Nomor antrian ' + num + ' berhasil diterbitkan!' });
+        }
+        else if (action === 'submitPrescription') {
+          var rxNum = "#RX-20261111-00" + (localMockState.prescriptions.length + 1);
+          var newRx = { id: 'rx-' + Date.now(), prescriptionNumber: rxNum, patientName: payload.patientName, doctorName: 'dr. Handoko, Sp.PD', penjamin: 'BPJS', items: payload.items || [], status: 'SEDANG_DIRACIK', createdAt: new Date().toLocaleTimeString('id-ID') + ' WIB' };
+          localMockState.prescriptions.unshift(newRx);
+          callback({ success: true, prescription: newRx, message: 'Resep digital ' + rxNum + ' berhasil dikirim ke Farmasi!' });
+        }
+        else if (action === 'getPharmacyOrders') callback({ success: true, prescriptions: localMockState.prescriptions });
+        else if (action === 'updatePrescriptionStatus') {
+          var p = localMockState.prescriptions.find(x=>x.id===payload.prescriptionId || x.prescriptionNumber===payload.prescriptionId);
+          if (p) p.status = payload.newStatus;
+          callback({ success: true, message: 'Status resep diubah menjadi ' + payload.newStatus });
+        }
+        else if (action === 'getVerificationList') callback({ success: true, verifications: localMockState.verifications });
+        else if (action === 'verifyClaim') {
+          var v = localMockState.verifications.find(x=>x.id===payload.verificationId);
+          if (v) v.status = payload.status;
+          callback({ success: true, message: 'Klaim berhasil diubah statusnya menjadi ' + payload.status });
+        }
+        else if (action === 'login') {
+          callback({ success: true, message: 'Autentikasi SIMRS Berhasil!' });
+        }
+        else callback({ success: true, message: 'Aksi selesai' });
+      }, 100);
+    }
+
+    function navigateToView(viewId) {
+      currentView = viewId;
+      document.querySelectorAll('.app-view').forEach(function(el) { el.classList.add('hidden'); });
+      var target = document.getElementById('view-' + viewId);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.top-nav-btn').forEach(function(btn) {
+        btn.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+        btn.classList.add('text-secondary', 'hover:text-on-surface');
+      });
+      var activeNav = document.getElementById('nav-' + viewId);
+      if (activeNav) {
+        activeNav.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+        activeNav.classList.remove('text-secondary');
+      }
+
+      if (viewId === 'tv') refreshTVDisplay();
+      if (viewId === 'doctor') refreshDoctorDashboard();
+      if (viewId === 'admin') refreshAdminAndPharmacy();
+      if (viewId === 'kiosk') setKioskPenjamin(selectedGuarantor);
+    }
+
+    function playIndonesianTTS(text) {
+      if (!('speechSynthesis' in window)) {
+        alert("TTS Audio: " + text);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      var utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      var voices = window.speechSynthesis.getVoices();
+      var idVoice = voices.find(function(v) { return v.lang.startsWith('id') || v.lang.includes('ID'); });
+      if (idVoice) utterance.voice = idVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function playCurrentActiveCallTTS() {
+      var text = document.getElementById('tv-tts-preview').innerText.replace('Format: ', '').replace(/"/g, '');
+      playIndonesianTTS(text);
+    }
+
+    function switchAuthTab(tab) {
+      var formPatient = document.getElementById('auth-form-patient');
+      var formStaff = document.getElementById('auth-form-staff');
+      var btnPatient = document.getElementById('auth-tab-patient');
+      var btnStaff = document.getElementById('auth-tab-staff');
+      if (tab === 'patient') {
+        formPatient.classList.remove('hidden');
+        formStaff.classList.add('hidden');
+        btnPatient.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5";
+        btnStaff.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5";
+      } else {
+        formPatient.classList.add('hidden');
+        formStaff.classList.remove('hidden');
+        btnStaff.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5";
+        btnPatient.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5";
+      }
+    }
+
+    function handleSendOTP() {
+      alert("Kode OTP WhatsApp simulasi terkirim: 742918");
+    }
+
+    function handleAuthSubmit(roleType) {
+      showToast("Login Berhasil! Mengalihkan ke dashboard...", "success");
+      if (roleType === 'staff') navigateToView('doctor');
+      else navigateToView('portal');
+    }
+
+    function setKioskPenjamin(type) {
+      selectedGuarantor = type;
+      var cardUmum = document.getElementById('kiosk-card-umum');
+      var cardBpjs = document.getElementById('kiosk-card-bpjs');
+      var cardAsuransi = document.getElementById('kiosk-card-asuransi');
+      var container = document.getElementById('kiosk-dynamic-form');
+
+      cardUmum.className = "cursor-pointer border-2 border-slate-200 hover:border-blue-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+      cardBpjs.className = "cursor-pointer border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+      cardAsuransi.className = "cursor-pointer border-2 border-slate-200 hover:border-amber-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+
+      if (type === 'UMUM') {
+        cardUmum.className = "cursor-pointer border-2 border-blue-500 ring-2 ring-blue-300 rounded-xl p-4 transition bg-blue-50/50 text-center space-y-2";
+        container.innerHTML = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-sm text-primary">Langkah 2: Data Pasien Umum (Self-Pay)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-xs font-semibold mb-1">NIK Pasien (KTP)</label><input type="text" id="kiosk-umum-nik" value="3274021908850001" class="w-full text-xs px-3 py-2 rounded-lg border"></div>
+              <div><label class="block text-xs font-semibold mb-1">Nama Lengkap Pasien</label><input type="text" id="kiosk-umum-name" value="Tn. Bambang Wijaya" class="w-full text-xs px-3 py-2 rounded-lg border"></div>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-xl border border-blue-200 flex justify-between items-center text-xs">
+              <span class="text-blue-900 font-medium">Estimasi Biaya Konsultasi Dokter Spesialis:</span>
+              <span class="font-bold text-primary text-sm font-mono">Rp 150.000,-</span>
+            </div>
+            <button onclick="handleKioskRegister()" class="w-full py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition">Konfirmasi & Terbitkan Tiket Antrian</button>
+          </div>
+        `;
+      } else if (type === 'BPJS') {
+        cardBpjs.className = "cursor-pointer border-2 border-emerald-500 ring-2 ring-emerald-300 rounded-xl p-4 transition bg-emerald-50/50 text-center space-y-2";
+        container.innerHTML = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-sm text-emerald-800">Langkah 2: Validasi Peserta BPJS Kesehatan & Rujukan</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-xs font-semibold mb-1">Nomor Kartu BPJS / NIK</label><input type="text" id="kiosk-bpjs-no" value="0001892837461" class="w-full text-xs px-3 py-2 rounded-lg border font-mono"></div>
+              <div><label class="block text-xs font-semibold mb-1">Nomor Rujukan Faskes 1</label><input type="text" id="kiosk-bpjs-ref" value="0115R0021126P000089" class="w-full text-xs px-3 py-2 rounded-lg border font-mono"></div>
+            </div>
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-600 material-symbols-fill">check_circle</span><div><p class="font-bold text-emerald-950">SEP Instan Siap Terbit Otomatis</p><p class="text-[11px] text-emerald-700">Puskesmas Kesambi -> Poli Penyakit Dalam RS Mahardika</p></div></div>
+              <span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">AKTIF</span>
+            </div>
+            <button onclick="handleKioskRegister()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition">Terbitkan SEP & Cetak Tiket Antrian</button>
+          </div>
+        `;
+      } else if (type === 'ASURANSI_SWASTA') {
+        cardAsuransi.className = "cursor-pointer border-2 border-amber-500 ring-2 ring-amber-300 rounded-xl p-4 transition bg-amber-50/50 text-center space-y-2";
+        container.innerHTML = `
+          <div class="space-y-4">
+            <h4 class="font-bold text-sm text-amber-800">Langkah 2: Data Kepesertaan Asuransi Swasta</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-xs font-semibold mb-1">Pilih Perusahaan Mitra Asuransi</label><select id="kiosk-asuransi-company" class="w-full text-xs px-3 py-2 rounded-lg border"><option>Prudential Life Assurance</option><option>Allianz Indonesia</option><option>Manulife Indonesia</option></select></div>
+              <div><label class="block text-xs font-semibold mb-1">Nomor Polis Asuransi</label><input type="text" id="kiosk-asuransi-policy" value="PRU-9921820" class="w-full text-xs px-3 py-2 rounded-lg border font-mono"></div>
+            </div>
+            <button onclick="handleKioskRegister()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition">Ajukan Pre-Auth & Cetak Tiket</button>
+          </div>
+        `;
+      }
+    }
+
+    function handleKioskRegister() {
+      var name = selectedGuarantor === 'UMUM' ? (document.getElementById('kiosk-umum-name')?.value || 'Tn. Bambang Wijaya') : (selectedGuarantor === 'BPJS' ? 'Ny. Siti Rahmawati' : 'Ny. Jessica Melina');
+      callServer('takeTicket', { penjamin: selectedGuarantor, patientName: name }, function(res) {
+        showToast(res.message, "success");
+        document.getElementById('ticket-number-display').innerText = res.ticket.ticketNumber;
+        document.getElementById('ticket-patient-display').innerText = res.ticket.patientName;
+        var badge = document.getElementById('ticket-badge-display');
+        if (res.ticket.penjamin === 'BPJS') {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-bpjs";
+          badge.innerText = "PASIEN BPJS KESEHATAN";
+          document.getElementById('ticket-sep-row').style.display = 'block';
+          document.getElementById('ticket-sep-display').innerText = res.ticket.sepNumber;
+        } else if (res.ticket.penjamin === 'UMUM') {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-umum";
+          badge.innerText = "PASIEN UMUM";
+          document.getElementById('ticket-sep-row').style.display = 'none';
+        } else {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-asuransi";
+          badge.innerText = "ASURANSI SWASTA";
+          document.getElementById('ticket-sep-row').style.display = 'block';
+          document.getElementById('ticket-sep-display').innerText = res.ticket.preAuthCode;
+        }
+      });
+    }
+
+    function refreshTVDisplay() {
+      callServer('getQueueState', {}, function(res) {
+        document.getElementById('tv-active-ticket').innerText = res.activeCall.ticketNumber;
+        document.getElementById('tv-active-poli').innerText = res.activeCall.poliName;
+        document.getElementById('tv-active-doc').innerText = res.activeCall.doctorName;
+        document.getElementById('tv-active-room').innerText = res.activeCall.room;
+        document.getElementById('tv-active-penjamin').innerText = res.activeCall.penjaminLabel;
+        document.getElementById('tv-tts-preview').innerText = 'Format: "' + res.activeCall.ttsText + '"';
+        document.getElementById('tv-other-clinics-list').innerHTML = res.otherClinics.map(item => `
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between shadow">
+            <div><p class="text-xs font-bold text-white">${item.poli}</p><p class="text-[11px] text-slate-400">${item.doctor}</p></div>
+            <div class="text-right"><span class="text-xl font-bold font-mono text-blue-400">${item.currentTicket}</span><span class="block text-[10px] text-slate-400 font-semibold">${item.penjamin}</span></div>
+          </div>
+        `).join('');
+      });
+    }
+
+    function refreshDoctorDashboard() {
+      callServer('getDoctorData', {}, function(res) {
+        document.getElementById('quota-umum').innerText = res.quotas.umum.current + ' / ' + res.quotas.umum.max;
+        document.getElementById('quota-bpjs').innerText = res.quotas.bpjs.current + ' / ' + res.quotas.bpjs.max;
+        document.getElementById('quota-asuransi').innerText = res.quotas.asuransi.current + ' / ' + res.quotas.asuransi.max;
+
+        var html = '';
+        if (res.activePatient) {
+          html += `
+            <div class="p-4 bg-blue-50/80 border-l-4 border-primary flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-black text-sm font-mono text-primary">${res.activePatient.ticketNumber}</span>
+                  <span class="chip-${res.activePatient.penjamin.toLowerCase().replace('_swasta','')} text-[10px] font-bold px-2 py-0.5 rounded">${res.activePatient.penjamin}</span>
+                  <span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded">Di Ruang Poli</span>
+                </div>
+                <p class="text-xs font-bold text-slate-900">${res.activePatient.patientName} (${res.activePatient.age} th)</p>
+                <p class="text-[11px] text-slate-500">RM: ${res.activePatient.no_rm}</p>
+              </div>
+              <span class="text-xs font-mono text-slate-500">${res.activePatient.time || '09:10'}</span>
+            </div>
+          `;
+        }
+        res.waitingList.forEach(function(item) {
+          var chip = item.penjamin === 'BPJS' ? 'chip-bpjs' : (item.penjamin === 'ASURANSI_SWASTA' ? 'chip-asuransi' : 'chip-umum');
+          html += `
+            <div onclick="handleCallSpecificTicket('${item.ticketNumber}')" class="p-3.5 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-bold text-xs font-mono text-slate-800">${item.ticketNumber}</span>
+                  <span class="${chip} text-[10px] font-bold px-2 py-0.5 rounded">${item.insuranceName || item.penjamin}</span>
+                  <span class="text-[10px] text-slate-400">Menunggu</span>
+                </div>
+                <p class="text-xs font-semibold text-slate-800">${item.patientName} (${item.age} th)</p>
+                <p class="text-[10px] text-slate-500">Klik untuk panggil ke poli</p>
+              </div>
+              <span class="text-xs font-mono text-slate-500">${item.time || '09:25'}</span>
+            </div>
+          `;
+        });
+        document.getElementById('doctor-queue-list').innerHTML = html;
+      });
+    }
+
+    function handleDoctorCallActive() {
+      callServer('callTicket', { ticketNumber: 'B-015' }, function(res) {
+        showToast(res.message, "success");
+        playIndonesianTTS(res.activeCall.ttsText);
+        refreshDoctorDashboard();
+      });
+    }
+
+    function handleCallSpecificTicket(num) {
+      callServer('callTicket', { ticketNumber: num }, function(res) {
+        showToast(res.message, "success");
+        playIndonesianTTS(res.activeCall.ttsText);
+        refreshDoctorDashboard();
+      });
+    }
+
+    function handleDoctorRecall() {
+      playIndonesianTTS("Panggilan ulang: Nomor antrian B-015, Pasien BPJS, silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2.");
+      showToast("Panggilan ulang disuarakan.", "info");
+    }
+
+    function handleDoctorComplete() {
+      showToast("Pemeriksaan pasien selesai.", "success");
+      refreshDoctorDashboard();
+    }
+
+    function handleAddRxItemPrompt() {
+      var drug = prompt("Nama Obat & Sediaan:", "Paracetamol 500 mg Tablet");
+      if (!drug) return;
+      var dosage = prompt("Dosis & Aturan Minum:", "3 x 1 Hari (Bila Demam)");
+      var el = document.createElement('div');
+      el.className = "p-3 rounded-xl bg-surface-container-low border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs";
+      el.innerHTML = `<div class="flex-1 min-w-[200px]"><p class="font-bold text-slate-900 rx-item-name">${drug}</p></div><div class="flex items-center gap-2"><span class="bg-white px-2 py-1 border rounded font-mono rx-item-dosage">${dosage}</span><button onclick="this.parentElement.parentElement.remove()" class="text-red-500">✕</button></div>`;
+      document.getElementById('rx-items-container').appendChild(el);
+    }
+
+    function handleDoctorSubmitPrescription() {
+      callServer('submitPrescription', { patientName: 'Ny. Siti Rahmawati' }, function(res) {
+        showToast(res.message, "success");
+        document.getElementById('rx-number-preview').innerText = res.prescription.prescriptionNumber;
+      });
+    }
+
+    function refreshAdminAndPharmacy() {
+      refreshDoctorList();
+      callServer('getVerificationList', {}, function(res) {
+        document.getElementById('admin-verification-list').innerHTML = res.verifications.map(v => `
+          <div class="p-3 bg-surface-container-low rounded-xl border border-slate-200 space-y-1.5">
+            <div class="flex justify-between items-center"><span class="chip-${v.penjamin==='BPJS'?'bpjs':'asuransi'} text-[10px] font-bold px-2 py-0.5 rounded">${v.insuranceCompany||v.penjamin}</span><span class="text-[10px] text-slate-400">${v.submittedAt}</span></div>
+            <p class="text-xs font-bold text-slate-900">${v.patientName} (${v.policyNumber})</p>
+            <p class="text-[11px] text-slate-500">Dokumen: ${v.documentType}</p>
+            ${v.status === 'PENDING' ? `
+              <div class="flex gap-2 pt-1">
+                <button onclick="handleAdminVerifyClaim('${v.id}','TERVERIFIKASI')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">✓ Setujui Pre-Auth</button>
+                <button onclick="handleAdminVerifyClaim('${v.id}','DITOLAK')" class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-semibold">✕ Tolak</button>
+              </div>
+            ` : `<span class="text-xs text-emerald-700 font-bold flex items-center gap-1">✓ Terverifikasi</span>`}
+          </div>
+        `).join('');
+      });
+
+      callServer('getPharmacyOrders', {}, function(res) {
+        document.getElementById('pharmacy-orders-list').innerHTML = res.prescriptions.map(rx => `
+          <div class="p-3 bg-surface-container-low rounded-xl border-l-4 ${rx.status==='SIAP_DISERAHKAN'?'border-emerald-500':'border-amber-500'} space-y-1.5">
+            <div class="flex justify-between items-center"><span class="font-mono font-bold text-xs text-primary">${rx.prescriptionNumber}</span><span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800">${rx.status}</span></div>
+            <p class="text-xs font-bold text-slate-800">${rx.patientName} (${rx.doctorName})</p>
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-[10px] text-slate-500">${rx.createdAt}</span>
+              ${rx.status === 'SEDANG_DIRACIK' ? `
+                <button onclick="handlePharmacyStatus('${rx.id}','SIAP_DISERAHKAN')" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs font-semibold">🔔 Panggil Pasien ke Loket Obat</button>
+              ` : `<button onclick="handlePharmacyStatus('${rx.id}','DISPENSED')" class="px-2.5 py-1 bg-slate-900 text-white rounded text-xs font-semibold">Serahkan Obat & Selesai</button>`}
+            </div>
+          </div>
+        `).join('');
+      });
+    }
+
+    function handleAdminVerifyClaim(id, status) {
+      callServer('verifyClaim', { verificationId: id, status: status }, function(res) {
+        showToast(res.message, "success");
+        refreshAdminAndPharmacy();
+      });
+    }
+
+    function handlePharmacyStatus(id, status) {
+      callServer('updatePrescriptionStatus', { prescriptionId: id, newStatus: status }, function(res) {
+        showToast(res.message, "success");
+        if (status === 'SIAP_DISERAHKAN') {
+          playIndonesianTTS("Nomor antrian resep F-029, silakan mengambil obat di Loket Farmasi 1 RS Mahardika Cirebon.");
+        }
+        refreshAdminAndPharmacy();
+      });
+    }
+
+    function openPatientRegisterModal() {
+      var modal = document.getElementById('modal-register-patient');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closePatientRegisterModal() {
+      var modal = document.getElementById('modal-register-patient');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function submitPatientRegister() {
+      var nik = document.getElementById('reg-patient-nik').value;
+      var name = document.getElementById('reg-patient-name').value;
+      var birth = document.getElementById('reg-patient-birth').value;
+      var gender = document.getElementById('reg-patient-gender').value;
+      var phone = document.getElementById('reg-patient-phone').value;
+      var penjamin = document.getElementById('reg-patient-penjamin').value;
+      var password = document.getElementById('reg-patient-password').value;
+
+      var newRM = '#RM-2026-' + Math.floor(1000 + Math.random() * 9000);
+      showToast("Pendaftaran Pasien Baru Berhasil! No. RM: " + newRM, "success");
+      closePatientRegisterModal();
+      var loginInput = document.getElementById('login-patient-id');
+      if (loginInput) loginInput.value = nik;
+      alert("Registrasi Pasien Berhasil!\n\nNama: " + name + "\nNo. Rekam Medis Elektronik: " + newRM + "\nNIK: " + nik + "\nPenjamin: " + penjamin + "\n\nPasien kini dapat langsung login atau mengambil antrian di Kiosk Lobi.");
+    }
+
+    function openAddDoctorModal() {
+      var modal = document.getElementById('modal-add-doctor');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeAddDoctorModal() {
+      var modal = document.getElementById('modal-add-doctor');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function submitAddDoctor() {
+      var nip = document.getElementById('add-doc-nip').value;
+      var name = document.getElementById('add-doc-name').value;
+      var sip = document.getElementById('add-doc-sip').value;
+      var poli = document.getElementById('add-doc-poli').value;
+      var room = document.getElementById('add-doc-room').value;
+      var kuotaUmum = document.getElementById('add-doc-kuota-umum').value;
+      var kuotaBpjs = document.getElementById('add-doc-kuota-bpjs').value;
+      var kuotaAsuransi = document.getElementById('add-doc-kuota-asuransi').value;
+
+      var newDoc = {
+        id: "doc-" + Date.now(),
+        name: name,
+        sip: sip || ("SIP.440/" + Math.floor(100 + Math.random() * 900) + "-Dinkes/2026"),
+        room: room,
+        status: "Poli Buka",
+        quotas: {
+          umum: { current: 0, max: parseInt(kuotaUmum) || 10 },
+          bpjs: { current: 0, max: parseInt(kuotaBpjs) || 15 },
+          asuransi: { current: 0, max: parseInt(kuotaAsuransi) || 5 }
+        }
+      };
+
+      if (!localMockState.doctors) {
+        localMockState.doctors = [
+          { id: "doc-001", name: "dr. Handoko, Sp.PD", sip: "SIP.440/129-Dinkes/2022", room: "Ruang Poli 2", status: "Poli Buka", quotas: { umum: { current: 8, max: 10 }, bpjs: { current: 14, max: 15 }, asuransi: { current: 3, max: 5 } } },
+          { id: "doc-002", name: "dr. Anita Lestari, Sp.A", sip: "SIP.440/088-Dinkes/2021", room: "Ruang Poli 1", status: "Poli Buka", quotas: { umum: { current: 5, max: 10 }, bpjs: { current: 12, max: 15 }, asuransi: { current: 2, max: 5 } } }
+        ];
+      }
+      localMockState.doctors.push(newDoc);
+      showToast("Dokter baru berhasil ditambahkan!", "success");
+      closeAddDoctorModal();
+      refreshDoctorList();
+      alert("Dokter Baru Berhasil Didaftarkan!\n\nNama: " + name + "\nNIP: " + nip + "\nRuangan: " + room + "\nKode TOTP MFA: 123456\n\nDokter sekarang dapat login menggunakan NIP tersebut.");
+    }
+
+    function refreshDoctorList() {
+      var table = document.getElementById('admin-doctors-table');
+      if (!table) return;
+      var docs = localMockState.doctors || [
+        { id: "doc-001", name: "dr. Handoko, Sp.PD", sip: "SIP.440/129-Dinkes/2022", room: "Ruang Poli 2", status: "Poli Buka", quotas: { umum: { current: 8, max: 10 }, bpjs: { current: 14, max: 15 }, asuransi: { current: 3, max: 5 } } },
+        { id: "doc-002", name: "dr. Anita Lestari, Sp.A", sip: "SIP.440/088-Dinkes/2021", room: "Ruang Poli 1", status: "Poli Buka", quotas: { umum: { current: 5, max: 10 }, bpjs: { current: 12, max: 15 }, asuransi: { current: 2, max: 5 } } }
+      ];
+
+      table.innerHTML = docs.map(function(doc) {
+        var uQuota = doc.quotas && doc.quotas.umum ? doc.quotas.umum.max : 10;
+        var bQuota = doc.quotas && doc.quotas.bpjs ? doc.quotas.bpjs.max : 15;
+        var aQuota = doc.quotas && doc.quotas.asuransi ? doc.quotas.asuransi.max : 5;
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-3">
+              <span class="font-bold text-slate-900 block">${doc.name}</span>
+              <span class="font-mono text-[10px] text-slate-500">${doc.sip}</span>
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="font-medium text-slate-800">${doc.room || 'Ruang Poli'}</span>
+            </td>
+            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${doc.sip}</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="font-bold text-blue-700">${uQuota}</span> /
+              <span class="font-bold text-emerald-700">${bQuota}</span> /
+              <span class="font-bold text-amber-700">${aQuota}</span>
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">${doc.status || 'Poli Buka'}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function handleReloadAllData() {
+      refreshAdminAndPharmacy();
+      refreshDoctorDashboard();
+      refreshTVDisplay();
+      showToast("Data SIMRS Mahardika telah diperbarui.", "info");
+    }
+
+    function showToast(msg, type) {
+      var toast = document.createElement('div');
+      var bg = type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-emerald-600');
+      toast.className = `fixed bottom-5 right-5 z-50 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold flex items-center gap-2 transform transition duration-300 translate-y-10 opacity-0 ${bg}`;
+      toast.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span> <span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('translate-y-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    setInterval(() => {
+      var now = new Date();
+      var str = (now.getHours()<10?'0':'')+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes()+':'+(now.getSeconds()<10?'0':'')+now.getSeconds()+' WIB';
+      if (document.getElementById('tv-live-clock')) document.getElementById('tv-live-clock').innerText = str;
+      if (document.getElementById('kiosk-live-clock')) document.getElementById('kiosk-live-clock').innerText = '11 Nov 2026 | ' + str.slice(0, 5) + ' WIB';
+    }, 1000);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      navigateToView('kiosk');
+    });
+  </script>
+</body>
+</html>
+

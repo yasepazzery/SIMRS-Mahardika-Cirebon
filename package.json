@@ -1,0 +1,21 @@
+{
+  "name": "simrs-rs-mahardika-cirebon",
+  "version": "1.2.0",
+  "description": "Sistem Informasi Manajemen Rumah Sakit (SIMRS) RS Mahardika Cirebon - Praktikum APSI SMT 5",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'Static Site Ready for Vercel'"
+  },
+  "keywords": [
+    "simrs",
+    "hospital-information-system",
+    "bpjs-vclaim",
+    "e-prescription",
+    "text-to-speech",
+    "apsi"
+  ],
+  "author": "Mahardika Clinical IT Team",
+  "license": "MIT"
+}
+

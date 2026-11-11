@@ -1,0 +1,925 @@
+<script>
+  /**
+   * SIMRS RS MAHARDIKA CIREBON - Client-Side Controller & Bridge
+   * Mengintegrasikan google.script.run dengan fallback lokal dan Speech Synthesis TTS
+   */
+
+  // Current State
+  var currentView = 'kiosk';
+  var selectedGuarantor = 'BPJS';
+  var currentDoctorData = null;
+  var cachedQueueState = null;
+
+  // Local Mock State (Fallback jika dijalankan langsung di luar Apps Script)
+  var localMockState = {
+    activeCall: {
+      ticketNumber: "B-015",
+      patientName: "Ny. Siti Rahmawati",
+      penjamin: "BPJS",
+      penjaminLabel: "PASIEN BPJS KESEHATAN",
+      poliName: "POLIKLINIK PENYAKIT DALAM",
+      room: "Ruang Poli 2 (Lantai 1)",
+      doctorName: "dr. Handoko, Sp.PD",
+      callTime: "09:14:32",
+      ttsText: "Nomor antrian B-015, Pasien BPJS, silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2."
+    },
+    queues: [
+      { id: "q-01", ticketNumber: "B-015", penjamin: "BPJS", patientName: "Ny. Siti Rahmawati", age: 46, status: "SEDANG_DIPERIKSA", no_rm: "#RM-2026-8812", doctorId: "doc-001" },
+      { id: "q-02", ticketNumber: "U-009", penjamin: "UMUM", patientName: "Tn. Bambang Wijaya", age: 38, status: "MENUNGGU", no_rm: "#RM-2026-9041", doctorId: "doc-001" },
+      { id: "q-03", ticketNumber: "A-004", penjamin: "ASURANSI_SWASTA", insuranceName: "PRUDENTIAL", patientName: "Ny. Jessica Melina", age: 29, status: "MENUNGGU", no_rm: "#RM-2026-9118", doctorId: "doc-001" }
+    ],
+    otherClinics: [
+      { poli: "Poli Anak & Tumbuh Kembang", doctor: "dr. Anita Lestari, Sp.A (Ruang 1)", currentTicket: "A-008", penjamin: "UMUM" },
+      { poli: "Poli Jantung & Pembuluh Darah", doctor: "dr. Budi Santoso, Sp.JP (Ruang 3)", currentTicket: "C-004", penjamin: "ASURANSI" },
+      { poli: "Poli Gigi & Mulut", doctor: "drg. Citra Dewi (Ruang 4)", currentTicket: "B-011", penjamin: "BPJS" }
+    ],
+    prescriptions: [
+      { id: "rx-008", prescriptionNumber: "#RX-20261111-008", patientName: "Ny. Siti Rahmawati", doctorName: "dr. Handoko, Sp.PD", penjamin: "BPJS", items: [{ name: "Metformin HCl 500mg (60 tab)" }, { name: "Glimepiride 2mg (30 tab)" }], status: "SEDANG_DIRACIK" },
+      { id: "rx-007", prescriptionNumber: "#RX-20261111-007", patientName: "Tn. Dedi Kusnadi", doctorName: "dr. Anita Lestari, Sp.A", penjamin: "UMUM", items: [{ name: "Amoxicillin Sirup (1 btl)" }], status: "SIAP_DISERAHKAN" }
+    ],
+    verifications: [
+      { id: "ver-01", patientName: "Ny. Jessica Melina", penjamin: "ASURANSI_SWASTA", insuranceCompany: "Prudential Life Assurance", policyNumber: "PRU-9921820", status: "PENDING", submittedAt: "10 menit lalu" }
+    ],
+    quotas: { umum: { current: 8, max: 10 }, bpjs: { current: 14, max: 15 }, asuransi: { current: 3, max: 5 } }
+  };
+
+  /**
+   * Universal RPC Bridge ke Google Apps Script Server
+   */
+  function callServer(action, payload, callback) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (callback) callback(res);
+        })
+        .withFailureHandler(function(err) {
+          console.error("Apps Script Error:", err);
+          showToast("Error: " + err.message, "error");
+        })
+        .apiDispatcher(action, payload);
+    } else {
+      // Local fallback simulation
+      setTimeout(function() {
+        var res = handleLocalMock(action, payload);
+        if (callback) callback(res);
+      }, 150);
+    }
+  }
+
+  function handleLocalMock(action, payload) {
+    if (action === 'getQueueState') {
+      return { success: true, activeCall: localMockState.activeCall, otherClinics: localMockState.otherClinics, queues: localMockState.queues };
+    }
+    if (action === 'callTicket') {
+      var q = localMockState.queues.find(function(item) { return item.ticketNumber === payload.ticketNumber; });
+      if (q) q.status = 'SEDANG_DIPERIKSA';
+      var penjLabel = q && q.penjamin === 'BPJS' ? 'Pasien BPJS' : (q && q.penjamin === 'ASURANSI_SWASTA' ? 'Pasien Asuransi Swasta' : 'Pasien Umum');
+      localMockState.activeCall = {
+        ticketNumber: payload.ticketNumber,
+        patientName: q ? q.patientName : "Pasien Terpanggil",
+        penjamin: q ? q.penjamin : "BPJS",
+        penjaminLabel: penjLabel.toUpperCase(),
+        poliName: "POLIKLINIK PENYAKIT DALAM",
+        room: "Ruang Poli 2 (Lantai 1)",
+        doctorName: "dr. Handoko, Sp.PD",
+        callTime: new Date().toLocaleTimeString('id-ID'),
+        ttsText: "Nomor antrian " + payload.ticketNumber + ", " + penjLabel + ", silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2."
+      };
+      return { success: true, activeCall: localMockState.activeCall };
+    }
+    if (action === 'takeTicket') {
+      var pref = payload.penjamin === 'BPJS' ? 'B-' : (payload.penjamin === 'ASURANSI_SWASTA' ? 'A-' : 'U-');
+      var num = pref + '0' + (localMockState.queues.length + 1);
+      var item = { id: 'q-' + Date.now(), ticketNumber: num, penjamin: payload.penjamin, patientName: payload.patientName || 'Pasien Mandiri', age: 40, status: 'MENUNGGU', doctorId: 'doc-001', no_rm: '#RM-2026-9999' };
+      localMockState.queues.push(item);
+      return { success: true, ticket: item, doctorName: 'dr. Handoko, Sp.PD', room: 'Ruang Poli 2', poliName: 'POLIKLINIK PENYAKIT DALAM' };
+    }
+    if (action === 'submitPrescription') {
+      var rx = { id: 'rx-' + Date.now(), prescriptionNumber: '#RX-' + Date.now().toString().slice(-6), patientName: payload.patientName, doctorName: 'dr. Handoko, Sp.PD', penjamin: payload.penjamin, items: payload.items || [], status: 'SEDANG_DIRACIK' };
+      localMockState.prescriptions.unshift(rx);
+      return { success: true, prescription: rx, message: 'Resep terkirim ke Depo Farmasi!' };
+    }
+    if (action === 'updatePrescriptionStatus') {
+      var r = localMockState.prescriptions.find(function(p) { return p.id === payload.prescriptionId; });
+      if (r) r.status = payload.newStatus;
+      return { success: true, prescriptions: localMockState.prescriptions };
+    }
+    if (action === 'verifyClaim') {
+      var v = localMockState.verifications.find(function(item) { return item.id === payload.verificationId; });
+      if (v) v.status = payload.status;
+      return { success: true, verifications: localMockState.verifications };
+    }
+    if (action === 'registerPatient') {
+      var newRM = '#RM-2026-' + Math.floor(1000 + Math.random() * 9000);
+      var newP = {
+        id: 'usr-' + Date.now(),
+        nip_or_nik: payload.nik,
+        full_name: payload.fullName,
+        phone: payload.phone,
+        no_rm: newRM,
+        role: 'PASIEN',
+        penjamin: payload.penjamin || 'BPJS'
+      };
+      if (!localMockState.users) localMockState.users = [];
+      localMockState.users.push(newP);
+      return {
+        success: true,
+        message: 'Pasien baru berhasil didaftarkan! No. Rekam Medis: ' + newRM,
+        patient: newP
+      };
+    }
+    if (action === 'addDoctor') {
+      var newD = {
+        id: 'doc-' + Date.now(),
+        name: payload.name,
+        sip: payload.sip || ('SIP.440/' + Math.floor(100 + Math.random() * 900) + '-Dinkes/2026'),
+        poli_id: payload.poliId,
+        room: payload.room || 'Ruang Poli 5',
+        status: 'Poli Buka',
+        quotas: {
+          umum: { current: 0, max: parseInt(payload.quotaUmum) || 10 },
+          bpjs: { current: 0, max: parseInt(payload.quotaBpjs) || 15 },
+          asuransi: { current: 0, max: parseInt(payload.quotaAsuransi) || 5 }
+        }
+      };
+      if (!localMockState.doctors) localMockState.doctors = [];
+      localMockState.doctors.push(newD);
+      return {
+        success: true,
+        message: 'Dokter ' + payload.name + ' berhasil ditambahkan ke master data!',
+        doctor: newD
+      };
+    }
+    if (action === 'getDoctorList') {
+      var docs = localMockState.doctors || [
+        { id: "doc-001", name: "dr. Handoko, Sp.PD", sip: "SIP.440/129-Dinkes/2022", room: "Ruang Poli 2", status: "Poli Buka", quotas: { umum: { current: 8, max: 10 }, bpjs: { current: 14, max: 15 }, asuransi: { current: 3, max: 5 } } },
+        { id: "doc-002", name: "dr. Anita Lestari, Sp.A", sip: "SIP.440/088-Dinkes/2021", room: "Ruang Poli 1", status: "Poli Buka", quotas: { umum: { current: 5, max: 10 }, bpjs: { current: 12, max: 15 }, asuransi: { current: 2, max: 5 } } }
+      ];
+      return { success: true, doctors: docs };
+    }
+    return { success: true, message: 'Operasi sukses.' };
+  }
+
+  /**
+   * Router Tampilan (Navigation Switching)
+   */
+  function navigateToView(viewId) {
+    currentView = viewId;
+    document.querySelectorAll('.app-view').forEach(function(el) {
+      el.classList.add('hidden');
+    });
+    var target = document.getElementById('view-' + viewId);
+    if (target) {
+      target.classList.remove('hidden');
+    }
+
+    // Update Nav Buttons
+    document.querySelectorAll('.top-nav-btn').forEach(function(btn) {
+      btn.classList.remove('bg-primary-container', 'text-white', 'shadow-sm');
+      btn.classList.add('text-secondary', 'hover:text-on-surface');
+    });
+    var activeNav = document.getElementById('nav-' + viewId);
+    if (activeNav) {
+      activeNav.classList.add('bg-primary-container', 'text-white', 'shadow-sm');
+      activeNav.classList.remove('text-secondary');
+    }
+
+    // Refresh Data Sesuai View
+    if (viewId === 'tv') refreshTVDisplay();
+    if (viewId === 'doctor') refreshDoctorDashboard();
+    if (viewId === 'admin') refreshAdminAndPharmacy();
+    if (viewId === 'kiosk') setKioskPenjamin(selectedGuarantor);
+  }
+
+  /**
+   * Audio Text-to-Speech (TTS) Voice Synthesizer Bahasa Indonesia
+   */
+  function playIndonesianTTS(text) {
+    if (!('speechSynthesis' in window)) {
+      alert("TTS: " + text);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+
+    var voices = window.speechSynthesis.getVoices();
+    var idVoice = voices.find(function(v) { return v.lang.startsWith('id') || v.lang.includes('ID'); });
+    if (idVoice) utterance.voice = idVoice;
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function playCurrentActiveCallTTS() {
+    var text = document.getElementById('tv-tts-preview').innerText.replace('Format: ', '').replace(/"/g, '');
+    playIndonesianTTS(text);
+  }
+
+  /**
+   * Layar 1: Auth Handlers
+   */
+  function switchAuthTab(tab) {
+    var formPatient = document.getElementById('auth-form-patient');
+    var formStaff = document.getElementById('auth-form-staff');
+    var btnPatient = document.getElementById('auth-tab-patient');
+    var btnStaff = document.getElementById('auth-tab-staff');
+
+    if (tab === 'patient') {
+      formPatient.classList.remove('hidden');
+      formStaff.classList.add('hidden');
+      btnPatient.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5";
+      btnStaff.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5";
+    } else {
+      formPatient.classList.add('hidden');
+      formStaff.classList.remove('hidden');
+      btnStaff.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-primary shadow-sm flex items-center justify-center gap-1.5";
+      btnPatient.className = "flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition text-secondary hover:text-on-surface flex items-center justify-center gap-1.5";
+    }
+  }
+
+  function togglePasswordVisibility(id) {
+    var input = document.getElementById(id);
+    if (input.type === 'password') input.type = 'text';
+    else input.type = 'password';
+  }
+
+  function handleSendOTP() {
+    callServer('sendOTP', { phone: '081234567890' }, function(res) {
+      showToast(res.message + " (Kode Demo: " + (res.debugOtp || '742918') + ")", "success");
+    });
+  }
+
+  function handleAuthSubmit(roleType) {
+    var payload = {
+      roleType: roleType,
+      identifier: roleType === 'patient' ? document.getElementById('login-patient-id').value : document.getElementById('login-staff-nip').value,
+      password: roleType === 'patient' ? document.getElementById('login-patient-pass').value : document.getElementById('login-staff-pass').value,
+      totpCode: roleType === 'staff' ? document.getElementById('login-staff-totp').value : ''
+    };
+
+    callServer('login', payload, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        if (roleType === 'staff') {
+          if (res.user && res.user.role === 'ADMIN_FARMASI') {
+            navigateToView('admin');
+          } else {
+            navigateToView('doctor');
+          }
+        } else {
+          navigateToView('portal');
+        }
+      } else {
+        showToast(res.message, "error");
+      }
+    });
+  }
+
+  /**
+   * Layar 2: Kiosk Mandiri Handlers
+   */
+  function setKioskPenjamin(type) {
+    selectedGuarantor = type;
+    var cardUmum = document.getElementById('kiosk-card-umum');
+    var cardBpjs = document.getElementById('kiosk-card-bpjs');
+    var cardAsuransi = document.getElementById('kiosk-card-asuransi');
+    var container = document.getElementById('kiosk-dynamic-form');
+
+    cardUmum.className = "cursor-pointer border-2 border-slate-200 hover:border-blue-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+    cardBpjs.className = "cursor-pointer border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+    cardAsuransi.className = "cursor-pointer border-2 border-slate-200 hover:border-amber-500 rounded-xl p-4 transition bg-surface-container-low hover:bg-white text-center space-y-2";
+
+    if (type === 'UMUM') {
+      cardUmum.className = "cursor-pointer border-2 border-blue-500 ring-2 ring-blue-300 rounded-xl p-4 transition bg-blue-50/50 text-center space-y-2";
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h4 class="font-bold text-sm text-primary">Langkah 2: Data Pasien Umum (Self-Pay)</h4>
+            <span class="chip-umum text-[10px] font-bold px-2 py-0.5 rounded">Pembayaran Mandiri</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIK Pasien (KTP)</label>
+              <input type="text" id="kiosk-umum-nik" value="3274021908850001" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Pasien</label>
+              <input type="text" id="kiosk-umum-name" value="Tn. Bambang Wijaya" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+            </div>
+          </div>
+          <div class="p-3 bg-blue-50 rounded-xl border border-blue-200 flex justify-between items-center text-xs">
+            <span class="text-blue-900 font-medium">Estimasi Biaya Konsultasi Dokter Spesialis:</span>
+            <span class="font-bold text-primary text-sm font-mono">Rp 150.000,-</span>
+          </div>
+          <button onclick="handleKioskRegister()" class="w-full py-3 bg-primary hover:bg-primary-container text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+            <span>Konfirmasi & Terbitkan Tiket Antrian</span>
+            <span class="material-symbols-outlined text-[18px]">print</span>
+          </button>
+        </div>
+      `;
+    } else if (type === 'BPJS') {
+      cardBpjs.className = "cursor-pointer border-2 border-emerald-500 ring-2 ring-emerald-300 rounded-xl p-4 transition bg-emerald-50/50 text-center space-y-2";
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h4 class="font-bold text-sm text-emerald-800">Langkah 2: Validasi Peserta BPJS Kesehatan & Rujukan</h4>
+            <span class="chip-bpjs text-[10px] font-bold px-2 py-0.5 rounded">Terhubung VClaim BPJS</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Kartu BPJS / NIK Pasien</label>
+              <input type="text" id="kiosk-bpjs-no" value="0001892837461" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Surat Rujukan Faskes 1</label>
+              <input type="text" id="kiosk-bpjs-ref" value="0115R0021126P000089" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+            </div>
+          </div>
+          <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 material-symbols-fill">check_circle</span>
+              <div>
+                <p class="font-bold text-emerald-950">SEP Instan Siap Terbit Otomatis</p>
+                <p class="text-[11px] text-emerald-700">Puskesmas Kesambi -> Poli Penyakit Dalam RS Mahardika</p>
+              </div>
+            </div>
+            <span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px]">AKTIF</span>
+          </div>
+          <button onclick="handleKioskRegister()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+            <span>Terbitkan SEP & Cetak Tiket Antrian</span>
+            <span class="material-symbols-outlined text-[18px]">print</span>
+          </button>
+        </div>
+      `;
+    } else if (type === 'ASURANSI_SWASTA') {
+      cardAsuransi.className = "cursor-pointer border-2 border-amber-500 ring-2 ring-amber-300 rounded-xl p-4 transition bg-amber-50/50 text-center space-y-2";
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <h4 class="font-bold text-sm text-amber-800">Langkah 2: Data Kepesertaan Asuransi Swasta</h4>
+            <span class="chip-asuransi text-[10px] font-bold px-2 py-0.5 rounded">Pre-Authorization Mitra</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Perusahaan Mitra Asuransi</label>
+              <select id="kiosk-asuransi-company" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300">
+                <option value="Prudential Life Assurance">Prudential Life Assurance</option>
+                <option value="Allianz Indonesia">Allianz Indonesia</option>
+                <option value="Manulife Indonesia">Manulife Indonesia</option>
+                <option value="Astra Life">Astra Life</option>
+                <option value="AdMedika Network">AdMedika Network</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Polis Asuransi</label>
+              <input type="text" id="kiosk-asuransi-policy" value="PRU-9921820" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 font-mono">
+            </div>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-600 text-[22px]">document_scanner</span>
+            <div>
+              <p class="font-bold">Pemindaian Kartu Asuransi Selesai</p>
+              <p class="text-[11px] text-amber-700">Berkas diteruskan ke Petugas Pendaftaran untuk approval.</p>
+            </div>
+          </div>
+          <button onclick="handleKioskRegister()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+            <span>Ajukan Pre-Auth & Cetak Tiket</span>
+            <span class="material-symbols-outlined text-[18px]">print</span>
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function handleKioskRegister() {
+    var patientName = "Pasien Mandiri";
+    var policy = null;
+    var company = null;
+
+    if (selectedGuarantor === 'UMUM') {
+      patientName = document.getElementById('kiosk-umum-name') ? document.getElementById('kiosk-umum-name').value : "Tn. Bambang Wijaya";
+    } else if (selectedGuarantor === 'BPJS') {
+      patientName = "Ny. Siti Rahmawati";
+    } else {
+      patientName = "Ny. Jessica Melina";
+      company = document.getElementById('kiosk-asuransi-company') ? document.getElementById('kiosk-asuransi-company').value : "Prudential";
+      policy = document.getElementById('kiosk-asuransi-policy') ? document.getElementById('kiosk-asuransi-policy').value : "PRU-9921820";
+    }
+
+    var payload = {
+      penjamin: selectedGuarantor,
+      patientName: patientName,
+      insuranceCompany: company,
+      policyNumber: policy,
+      poliId: 'poli-int',
+      doctorId: 'doc-001'
+    };
+
+    callServer('takeTicket', payload, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        // Update ticket preview
+        document.getElementById('ticket-number-display').innerText = res.ticket.ticketNumber;
+        document.getElementById('ticket-patient-display').innerText = res.ticket.patientName;
+        document.getElementById('ticket-poli-display').innerText = res.poliName;
+        document.getElementById('ticket-doc-display').innerText = res.doctorName;
+        document.getElementById('ticket-room-display').innerText = res.room;
+
+        var badge = document.getElementById('ticket-badge-display');
+        if (res.ticket.penjamin === 'BPJS') {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-bpjs";
+          badge.innerText = "PASIEN BPJS KESEHATAN";
+          document.getElementById('ticket-sep-row').style.display = 'block';
+          document.getElementById('ticket-sep-display').innerText = res.ticket.sepNumber || '0115R0021126V000142';
+        } else if (res.ticket.penjamin === 'UMUM') {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-umum";
+          badge.innerText = "PASIEN UMUM";
+          document.getElementById('ticket-sep-row').style.display = 'none';
+        } else {
+          badge.className = "inline-block px-3 py-1 rounded font-bold text-xs chip-asuransi";
+          badge.innerText = "ASURANSI SWASTA";
+          document.getElementById('ticket-sep-row').style.display = 'block';
+          document.getElementById('ticket-sep-display').innerText = res.ticket.preAuthCode || 'AUTH-89210';
+        }
+      } else {
+        showToast(res.message, "error");
+      }
+    });
+  }
+
+  /**
+   * Layar 3: TV Display Handlers
+   */
+  function refreshTVDisplay() {
+    callServer('getQueueState', {}, function(res) {
+      if (res.success && res.activeCall) {
+        cachedQueueState = res;
+        document.getElementById('tv-active-ticket').innerText = res.activeCall.ticketNumber;
+        document.getElementById('tv-active-poli').innerText = res.activeCall.poliName;
+        document.getElementById('tv-active-doc').innerText = res.activeCall.doctorName;
+        document.getElementById('tv-active-room').innerText = res.activeCall.room;
+        document.getElementById('tv-tts-preview').innerText = 'Format: "' + res.activeCall.ttsText + '"';
+
+        var penjLabel = document.getElementById('tv-active-penjamin');
+        penjLabel.innerText = res.activeCall.penjaminLabel;
+
+        // Render Other Clinics
+        var otherContainer = document.getElementById('tv-other-clinics-list');
+        if (otherContainer && res.otherClinics) {
+          otherContainer.innerHTML = res.otherClinics.map(function(item) {
+            var badgeClass = item.penjamin === 'BPJS' ? 'text-emerald-400' : (item.penjamin === 'ASURANSI' ? 'text-amber-400' : 'text-blue-400');
+            return `
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between shadow">
+                <div>
+                  <p class="text-xs font-bold text-white">${item.poli}</p>
+                  <p class="text-[11px] text-slate-400">${item.doctor}</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-xl font-bold font-mono ${badgeClass}">${item.currentTicket}</span>
+                  <span class="block text-[10px] text-slate-400 font-semibold">${item.penjamin}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    });
+  }
+
+  /**
+   * Layar 4: Doctor Workspace Handlers
+   */
+  function refreshDoctorDashboard() {
+    callServer('getDoctorData', { doctorId: 'doc-001' }, function(res) {
+      if (res.success) {
+        currentDoctorData = res;
+        if (res.quotas) {
+          document.getElementById('quota-umum').innerText = res.quotas.umum.current + ' / ' + res.quotas.umum.max;
+          document.getElementById('quota-bpjs').innerText = res.quotas.bpjs.current + ' / ' + res.quotas.bpjs.max;
+          document.getElementById('quota-asuransi').innerText = res.quotas.asuransi.current + ' / ' + res.quotas.asuransi.max;
+        }
+
+        var queueListEl = document.getElementById('doctor-queue-list');
+        var html = '';
+
+        // Pasien Aktif
+        if (res.activePatient) {
+          document.getElementById('rx-patient-label').innerText = res.activePatient.patientName;
+          document.getElementById('rx-penjamin-label').innerText = res.activePatient.penjamin;
+          html += `
+            <div class="p-4 bg-blue-50/80 border-l-4 border-primary flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-black text-sm font-mono text-primary">${res.activePatient.ticketNumber}</span>
+                  <span class="chip-${res.activePatient.penjamin.toLowerCase().replace('_swasta','')} text-[10px] font-bold px-2 py-0.5 rounded">${res.activePatient.penjamin}</span>
+                  <span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded">Di Ruang Poli</span>
+                </div>
+                <p class="text-xs font-bold text-slate-900">${res.activePatient.patientName} (${res.activePatient.age} th)</p>
+                <p class="text-[11px] text-slate-500">RM: ${res.activePatient.no_rm || '#RM-2026-8812'}</p>
+              </div>
+              <span class="text-xs font-mono text-slate-500">${res.activePatient.time || '09:10'}</span>
+            </div>
+          `;
+        }
+
+        // Pasien Menunggu
+        if (res.waitingList && res.waitingList.length > 0) {
+          res.waitingList.forEach(function(item) {
+            var chipClass = item.penjamin === 'BPJS' ? 'chip-bpjs' : (item.penjamin === 'ASURANSI_SWASTA' ? 'chip-asuransi' : 'chip-umum');
+            html += `
+              <div onclick="handleCallSpecificTicket('${item.ticketNumber}')" class="p-3.5 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-bold text-xs font-mono text-slate-800">${item.ticketNumber}</span>
+                    <span class="${chipClass} text-[10px] font-bold px-2 py-0.5 rounded">${item.insuranceName || item.penjamin}</span>
+                    <span class="text-[10px] text-slate-400">Menunggu</span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800">${item.patientName} (${item.age} th)</p>
+                  <p class="text-[10px] text-slate-500">Klik untuk panggil ke poli</p>
+                </div>
+                <span class="text-xs font-mono text-slate-500">${item.time || '09:25'}</span>
+              </div>
+            `;
+          });
+        }
+
+        queueListEl.innerHTML = html;
+      }
+    });
+  }
+
+  function handleDoctorCallActive() {
+    callServer('callTicket', { ticketNumber: 'B-015' }, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        playIndonesianTTS(res.activeCall.ttsText);
+        refreshDoctorDashboard();
+      }
+    });
+  }
+
+  function handleCallSpecificTicket(ticketNum) {
+    callServer('callTicket', { ticketNumber: ticketNum }, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        playIndonesianTTS(res.activeCall.ttsText);
+        refreshDoctorDashboard();
+      }
+    });
+  }
+
+  function handleDoctorRecall() {
+    var tts = "Panggilan ulang: Nomor antrian B-015, Pasien BPJS, silakan menuju Poliklinik Penyakit Dalam RS Mahardika Cirebon, Ruang Poli 2.";
+    playIndonesianTTS(tts);
+    showToast("Panggilan ulang disuarakan.", "info");
+  }
+
+  function handleDoctorComplete() {
+    callServer('completeTicket', { ticketNumber: 'B-015' }, function(res) {
+      showToast(res.message, "success");
+      refreshDoctorDashboard();
+    });
+  }
+
+  function handleAddRxItemPrompt() {
+    var drugName = prompt("Nama Obat & Sediaan (Master Formularium):", "Paracetamol 500 mg Tablet");
+    if (!drugName) return;
+    var dosage = prompt("Dosis & Aturan Minum:", "3 x 1 Hari (Bila Demam)");
+    var qty = prompt("Jumlah / Kuantitas:", "10");
+
+    var container = document.getElementById('rx-items-container');
+    var el = document.createElement('div');
+    el.className = "p-3 rounded-xl bg-surface-container-low border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs";
+    el.innerHTML = `
+      <div class="flex-1 min-w-[200px]">
+        <p class="font-bold text-slate-900 rx-item-name">${drugName}</p>
+        <p class="text-[11px] text-slate-500">Sediaan Obat Ditambahkan</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="bg-white px-2 py-1 border rounded text-[11px] font-mono rx-item-dosage">${dosage || '3 x 1'}</span>
+        <span class="font-bold text-slate-800 rx-item-qty">${qty || '10'}</span>
+        <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700">✕</button>
+      </div>
+    `;
+    container.appendChild(el);
+  }
+
+  function handleDoctorSubmitPrescription() {
+    var patientName = document.getElementById('rx-patient-label').innerText;
+    var diagnosis = document.getElementById('rx-diagnosis').value;
+    var notes = document.getElementById('rx-notes').value;
+
+    var items = [];
+    document.querySelectorAll('#rx-items-container > div').forEach(function(row) {
+      var name = row.querySelector('.rx-item-name') ? row.querySelector('.rx-item-name').innerText : '';
+      var dosage = row.querySelector('.rx-item-dosage') ? row.querySelector('.rx-item-dosage').innerText : '';
+      var qty = row.querySelector('.rx-item-qty') ? row.querySelector('.rx-item-qty').innerText : '';
+      if (name) items.push({ name: name, dosage: dosage, qty: qty });
+    });
+
+    var payload = {
+      patientName: patientName,
+      diagnosis: diagnosis,
+      notes: notes,
+      items: items,
+      penjamin: 'BPJS'
+    };
+
+    callServer('submitPrescription', payload, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        document.getElementById('rx-number-preview').innerText = res.prescription.prescriptionNumber;
+      }
+    });
+  }
+
+  /**
+   * Layar 5: Admin & Depo Farmasi Handlers
+   */
+  function refreshAdminAndPharmacy() {
+    refreshDoctorList();
+    // Verifications
+    callServer('getVerificationList', {}, function(res) {
+      if (res.success && res.verifications) {
+        var list = document.getElementById('admin-verification-list');
+        list.innerHTML = res.verifications.map(function(item) {
+          var chip = item.penjamin === 'BPJS' ? 'chip-bpjs' : 'chip-asuransi';
+          var isPending = item.status === 'PENDING';
+          return `
+            <div class="p-3.5 bg-surface-container-low rounded-xl border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="${chip} text-[10px] font-bold px-2 py-0.5 rounded">${item.insuranceCompany || item.penjamin}</span>
+                <span class="text-[11px] text-slate-500">${item.submittedAt || 'Baru saja'}</span>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-900">${item.patientName} (Polis: ${item.policyNumber || '-'})</p>
+                <p class="text-[11px] text-slate-600">Dokumen: ${item.documentType}</p>
+              </div>
+              <div class="flex items-center gap-2 pt-1">
+                ${isPending ? `
+                  <button onclick="handleAdminVerifyClaim('${item.id}', 'TERVERIFIKASI')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
+                    ✓ Setujui Pre-Auth
+                  </button>
+                  <button onclick="handleAdminVerifyClaim('${item.id}', 'DITOLAK')" class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-semibold">
+                    ✕ Tolak
+                  </button>
+                ` : `
+                  <span class="text-xs text-emerald-700 font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    <span>Telah Diverifikasi</span>
+                  </span>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+
+    // Pharmacy Orders
+    callServer('getPharmacyOrders', {}, function(res) {
+      if (res.success && res.prescriptions) {
+        var list = document.getElementById('pharmacy-orders-list');
+        list.innerHTML = res.prescriptions.map(function(rx) {
+          var chip = rx.penjamin === 'BPJS' ? 'chip-bpjs' : 'chip-umum';
+          var isDispensed = rx.status === 'DISPENSED';
+          var isReady = rx.status === 'SIAP_DISERAHKAN';
+
+          return `
+            <div class="p-3.5 bg-surface-container-low rounded-xl border-l-4 ${isReady ? 'border-emerald-500' : 'border-amber-500'} space-y-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-xs text-primary">${rx.prescriptionNumber}</span>
+                  <span class="${chip} text-[10px] font-bold px-2 py-0.2 rounded">${rx.penjamin}</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isReady ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${rx.status.replace('_', ' ')}
+                </span>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-800">${rx.patientName} (${rx.doctorName})</p>
+                <p class="text-[11px] text-slate-500">${rx.items ? rx.items.map(function(i){ return i.name; }).join(', ') : 'Obat siap racik'}</p>
+              </div>
+              <div class="flex items-center justify-between pt-2">
+                <span class="text-[10px] text-slate-500 font-mono">${rx.createdAt || '09:22 WIB'}</span>
+                <div class="flex gap-1.5">
+                  ${!isReady && !isDispensed ? `
+                    <button onclick="handlePharmacyStatus('${rx.id}', 'SIAP_DISERAHKAN')" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs font-semibold">
+                      🔔 Panggil ke Loket
+                    </button>
+                  ` : ''}
+                  ${isReady ? `
+                    <button onclick="handlePharmacyStatus('${rx.id}', 'DISPENSED')" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-semibold">
+                      Serahkan & Selesai
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+  }
+
+  function handleAdminVerifyClaim(verId, status) {
+    callServer('verifyClaim', { verificationId: verId, status: status }, function(res) {
+      showToast(res.message, "success");
+      refreshAdminAndPharmacy();
+    });
+  }
+
+  function handlePharmacyStatus(rxId, status) {
+    callServer('updatePrescriptionStatus', { prescriptionId: rxId, newStatus: status }, function(res) {
+      showToast(res.message, "success");
+      if (status === 'SIAP_DISERAHKAN') {
+        playIndonesianTTS("Nomor antrian resep F-029, silakan mengambil obat di Loket Farmasi 1 RS Mahardika Cirebon.");
+      }
+      refreshAdminAndPharmacy();
+    });
+  }
+
+  function handleReloadAllData() {
+    refreshAdminAndPharmacy();
+    refreshDoctorDashboard();
+    refreshTVDisplay();
+    showToast("Data SIMRS Mahardika telah diperbarui.", "info");
+  }
+
+  /**
+   * Modal & Fitur Registrasi Pasien Baru (Modul 4.1 PRD)
+   */
+  function openPatientRegisterModal() {
+    var modal = document.getElementById('modal-register-patient');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closePatientRegisterModal() {
+    var modal = document.getElementById('modal-register-patient');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function submitPatientRegister() {
+    var nik = document.getElementById('reg-patient-nik').value;
+    var name = document.getElementById('reg-patient-name').value;
+    var birth = document.getElementById('reg-patient-birth').value;
+    var gender = document.getElementById('reg-patient-gender').value;
+    var phone = document.getElementById('reg-patient-phone').value;
+    var penjamin = document.getElementById('reg-patient-penjamin').value;
+    var password = document.getElementById('reg-patient-password').value;
+
+    var payload = {
+      nik: nik,
+      fullName: name,
+      birthDate: birth,
+      gender: gender,
+      phone: phone,
+      penjamin: penjamin,
+      password: password
+    };
+
+    callServer('registerPatient', payload, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        closePatientRegisterModal();
+        // Isi otomatis form login dengan NIK baru
+        var loginInput = document.getElementById('login-patient-id');
+        if (loginInput) loginInput.value = nik;
+        alert("Pendaftaran Berhasil!\n\nNama: " + name + "\nNo. Rekam Medis: " + res.patient.no_rm + "\nNIK: " + nik + "\n\nSilakan gunakan NIK ini untuk login atau reservasi di Kiosk Lobi.");
+      } else {
+        showToast(res.message, "error");
+      }
+    });
+  }
+
+  /**
+   * Modal & Fitur Tambah Dokter Baru (Modul 4.6 PRD)
+   */
+  function openAddDoctorModal() {
+    var modal = document.getElementById('modal-add-doctor');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeAddDoctorModal() {
+    var modal = document.getElementById('modal-add-doctor');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function submitAddDoctor() {
+    var nip = document.getElementById('add-doc-nip').value;
+    var name = document.getElementById('add-doc-name').value;
+    var sip = document.getElementById('add-doc-sip').value;
+    var poli = document.getElementById('add-doc-poli').value;
+    var room = document.getElementById('add-doc-room').value;
+    var kuotaUmum = document.getElementById('add-doc-kuota-umum').value;
+    var kuotaBpjs = document.getElementById('add-doc-kuota-bpjs').value;
+    var kuotaAsuransi = document.getElementById('add-doc-kuota-asuransi').value;
+    var password = document.getElementById('add-doc-password').value;
+
+    var payload = {
+      nip: nip,
+      name: name,
+      sip: sip,
+      poliId: poli,
+      room: room,
+      quotaUmum: kuotaUmum,
+      quotaBpjs: kuotaBpjs,
+      quotaAsuransi: kuotaAsuransi,
+      password: password
+    };
+
+    callServer('addDoctor', payload, function(res) {
+      if (res.success) {
+        showToast(res.message, "success");
+        closeAddDoctorModal();
+        refreshDoctorList();
+        alert("Dokter Baru Berhasil Didaftarkan!\n\nNama: " + name + "\nNIP: " + nip + "\nRuangan: " + room + "\nKode TOTP MFA: 123456\n\nDokter sekarang dapat login menggunakan NIP tersebut.");
+      } else {
+        showToast(res.message, "error");
+      }
+    });
+  }
+
+  function refreshDoctorList() {
+    callServer('getDoctorList', {}, function(res) {
+      var table = document.getElementById('admin-doctors-table');
+      if (table && res.doctors) {
+        table.innerHTML = res.doctors.map(function(doc) {
+          var uQuota = doc.quotas && doc.quotas.umum ? doc.quotas.umum.max : 10;
+          var bQuota = doc.quotas && doc.quotas.bpjs ? doc.quotas.bpjs.max : 15;
+          var aQuota = doc.quotas && doc.quotas.asuransi ? doc.quotas.asuransi.max : 5;
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-2.5 px-3">
+                <span class="font-bold text-slate-900 block">${doc.name}</span>
+                <span class="font-mono text-[10px] text-slate-500">${doc.sip}</span>
+              </td>
+              <td class="py-2.5 px-3">
+                <span class="font-medium text-slate-800">${doc.room || 'Ruang Poli'}</span>
+              </td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">${doc.sip}</td>
+              <td class="py-2.5 px-3 text-center">
+                <span class="font-bold text-blue-700">${uQuota}</span> /
+                <span class="font-bold text-emerald-700">${bQuota}</span> /
+                <span class="font-bold text-amber-700">${aQuota}</span>
+              </td>
+              <td class="py-2.5 px-3">
+                <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">${doc.status || 'Poli Buka'}</span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    });
+  }
+
+  /**
+   * Toast Notification Utility
+   */
+  function showToast(msg, type) {
+    var toast = document.createElement('div');
+    var bg = type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-emerald-600');
+    toast.className = `fixed bottom-5 right-5 z-50 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold flex items-center gap-2 transform transition duration-300 translate-y-10 opacity-0 ${bg}`;
+    toast.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span> <span>${msg}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(function() {
+      toast.classList.remove('translate-y-10', 'opacity-0');
+    }, 10);
+
+    setTimeout(function() {
+      toast.classList.add('translate-y-10', 'opacity-0');
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 3500);
+  }
+
+  // Real-time Clock Simulation
+  setInterval(function() {
+    var now = new Date();
+    var timeStr = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' +
+                  (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ':' +
+                  (now.getSeconds() < 10 ? '0' : '') + now.getSeconds() + ' WIB';
+
+    var tvClock = document.getElementById('tv-live-clock');
+    if (tvClock) tvClock.innerText = timeStr;
+
+    var kioskClock = document.getElementById('kiosk-live-clock');
+    if (kioskClock) kioskClock.innerText = '11 Nov 2026 | ' + timeStr.slice(0, 5) + ' WIB';
+  }, 1000);
+
+  // Auto-polling TV & Queue every 5 seconds
+  setInterval(function() {
+    if (currentView === 'tv') {
+      refreshTVDisplay();
+    }
+  }, 5000);
+
+  // Initialize Default View on Page Load
+  window.addEventListener('DOMContentLoaded', function() {
+    var initial = typeof INITIAL_VIEW !== 'undefined' ? INITIAL_VIEW : 'kiosk';
+    navigateToView(initial);
+  });
+</script>
+

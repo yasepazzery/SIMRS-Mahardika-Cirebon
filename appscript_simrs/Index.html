@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SIMRS RS Mahardika Cirebon</title>
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/aida/ALJJyrAKCNOiQCFKcqfjXJSYGeKfHxzJH9DWLtfFam7BIdsu1AtHyn4YBKEjN5raKjR4lyopoHx2vExlARhwbKsuwf-CI-r42kXiRGcr9GnBIbFiAt_LYd3UFWxtSVUNDcoBLl_TnLA2528mn1PiWDOhQZjIt80jdxARItmRXBS4jNV8iDH_36-3eQ8C2duHWqBHHrEMXHCn8gfkRRZjBMmuu6ZSHHdEzrsUuykjtUztNndS">
+  
+  <!-- Apps Script Best Practice: Modular Stylesheet Include -->
+  <?!= include('Stylesheet'); ?>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- ======================================================== -->
+  <!-- TOP PERSISTENT ROLE & SCREEN NAVIGATION BAR              -->
+  <!-- Memudahkan Dosen / Penguji Memeriksa Seluruh Alur Sistem -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateToView('kiosk')">
+        <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-lg shadow">
+          +
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display font-bold text-slate-900 text-sm sm:text-base leading-tight">RS Mahardika Cirebon</span>
+            <span class="bg-blue-100 text-primary text-[10px] font-bold px-2 py-0.2 rounded-full">v1.2 AppsScript</span>
+          </div>
+          <p class="text-[10px] text-slate-500">APSI Praktikum SMT 5 • Google Apps Script Fullstack</p>
+        </div>
+      </div>
+
+      <!-- Quick Role / Screen Switcher Pills -->
+      <nav class="flex flex-wrap items-center bg-surface-container-low p-1 rounded-xl border border-slate-200 text-xs font-semibold gap-1">
+        <button id="nav-kiosk" onclick="navigateToView('kiosk')" class="top-nav-btn px-2.5 py-1.5 rounded-lg bg-primary-container text-white shadow-sm transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">touch_app</span>
+          <span>Kiosk Lobi</span>
+        </button>
+
+        <button id="nav-tv" onclick="navigateToView('tv')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">tv</span>
+          <span>TV Display (TTS)</span>
+        </button>
+
+        <button id="nav-doctor" onclick="navigateToView('doctor')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">stethoscope</span>
+          <span>Dokter & Resep</span>
+        </button>
+
+        <button id="nav-admin" onclick="navigateToView('admin')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">local_pharmacy</span>
+          <span>Admin & Farmasi</span>
+        </button>
+
+        <button id="nav-portal" onclick="navigateToView('portal')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">person</span>
+          <span>Portal Pasien</span>
+        </button>
+
+        <button id="nav-auth" onclick="navigateToView('auth')" class="top-nav-btn px-2.5 py-1.5 rounded-lg text-secondary hover:text-on-surface transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">lock</span>
+          <span>Login / MFA</span>
+        </button>
+      </nav>
+
+      <!-- Reset Database Utility Button -->
+      <div class="hidden xl:flex items-center">
+        <button onclick="if(confirm('Reset ulang data demo SIMRS ke kondisi awal?')){callServer('resetDatabase',{},function(r){alert(r.message);location.reload();});}" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px] font-semibold transition" title="Kembalikan data ke awal">
+          ↺ Reset DB
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MODULAR VIEW PARTIALS (Apps Script Best Practice)        -->
+  <!-- ======================================================== -->
+  <main class="flex-1 w-full">
+    <?!= include('ViewKiosk'); ?>
+    <?!= include('ViewTVDisplay'); ?>
+    <?!= include('ViewDoctor'); ?>
+    <?!= include('ViewAdminPharmacy'); ?>
+    <?!= include('ViewPatientPortal'); ?>
+    <?!= include('ViewAuth'); ?>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- INSTITUTIONAL FOOTER                                     -->
+  <!-- ======================================================== -->
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>© 2026 RS Mahardika Cirebon. Sistem Informasi Manajemen Rumah Sakit (SIMRS) Terintegrasi BPJS VClaim & Kemenkes SatuSehat.</p>
+      <p class="font-mono text-[11px] text-slate-400">Arsitektur: Google Apps Script Web App Engine (HTML Service)</p>
+    </div>
+  </footer>
+
+  <!-- Pass initial server variable -->
+  <script>
+    var INITIAL_VIEW = "<?= initialView ?>";
+  </script>
+
+  <!-- Apps Script Best Practice: Modular Javascript Include -->
+  <?!= include('Javascript'); ?>
+</body>
+</html>
+
